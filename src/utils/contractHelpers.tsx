@@ -10,7 +10,7 @@ import {
 import polkasignAbi from '../config/abi/polkasign.json'
 
 export const getApi = async () => {
-  const ws_endpoint = 'wss://43.133.174.232:9944';
+  const ws_endpoint = 'ws://43.133.174.232:9944';
   const provider = new WsProvider(ws_endpoint);
   const api = await ApiPromise.create({
     provider: provider,

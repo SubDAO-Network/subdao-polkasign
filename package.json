@@ -12,9 +12,7 @@
     "format": "prettier --write .",
     "lint": "eslint . --ext ts --ext tsx --ext js --ext jsx",
     "test": "jest",
-    "test-all": "yarn lint && yarn type-check && yarn test",
-    "storybook:dev": "start-storybook -s public -p 9001",
-    "storybook:build": "build-storybook -s public"
+    "test-all": "yarn lint && yarn type-check && yarn test"
   },
   "lint-staged": {
     "*.@(ts|tsx|js|jsx)": [
@@ -64,12 +62,6 @@
   },
   "devDependencies": {
     "@babel/core": "7.15.5",
-    "@storybook/addon-actions": "6.3.8",
-    "@storybook/addon-essentials": "6.3.8",
-    "@storybook/addon-links": "6.3.8",
-    "@storybook/builder-webpack5": "6.3.8",
-    "@storybook/manager-webpack5": "6.3.8",
-    "@storybook/react": "6.3.8",
     "@svgr/webpack": "5.5.0",
     "@testing-library/react": "12.0.0",
     "@types/jest": "27.0.1",

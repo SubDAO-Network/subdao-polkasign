@@ -20,11 +20,9 @@
     ]
   },
   "dependencies": {
-    "@ethersproject/providers": "^5.4.5",
     "@fleekhq/fleek-storage-js": "^1.0.20",
     "@headlessui/react": "1.4.1",
     "@heroicons/react": "1.0.4",
-    "@parrotfi/wallets": "1.0.8",
     "@polkadot/api": "^6.4.2",
     "@polkadot/api-contract": "^6.4.2",
     "@polkadot/extension-dapp": "^0.40.3",
@@ -32,10 +30,6 @@
     "@popperjs/core": "2.10.1",
     "@project-serum/anchor": "0.13.2",
     "@solana/spl-token": "0.1.8",
-    "@solana/web3.js": "1.24.2",
-    "@web3-react/core": "^6.1.9",
-    "@web3-react/injected-connector": "^6.0.7",
-    "@web3-react/walletconnect-connector": "^6.2.4",
     "antd": "^4.16.13",
     "antd-mobile": "^2.3.4",
     "bignumber.js": "9.0.1",
@@ -55,9 +49,6 @@
     "react-popper": "2.2.5",
     "react-spring": "9.2.4",
     "react-transition-group": "4.4.2",
-    "web3": "^1.6.0",
-    "web3-core-helpers": "^1.6.0",
-    "web3-utils": "^1.6.0",
     "zustand": "3.5.10"
   },
   "devDependencies": {
@@ -80,7 +71,6 @@
     "identity-obj-proxy": "3.0.0",
     "jest": "27.1.0",
     "lint-staged": "11.1.2",
-    "pdfjs-dist": "^2.10.377",
     "postcss": "8.3.6",
     "postcss-loader": "6.1.1",
     "postcss-preset-env": "6.7.0",

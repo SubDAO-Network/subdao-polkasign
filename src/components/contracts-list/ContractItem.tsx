@@ -4,6 +4,8 @@ import moment from 'moment'
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { Toast } from 'antd-mobile';
 import { message } from 'antd'
+import useAppStore from '../../stores/useAppStore'
+import useAccountStore from '../../stores/useAccountStore'
 
 
 interface ContractItemProps {
@@ -15,7 +17,8 @@ export const ContractItem: React.FC<ContractItemProps> = ({
   last,
   contract
 }) => {
-
+  const { set: setAppStore } = useAppStore((state) => state)
+  const { set: setAccountStore } = useAccountStore((state) => state)
   const [isActive, setActive] = useState(false)
 
   return (
@@ -69,7 +72,15 @@ export const ContractItem: React.FC<ContractItemProps> = ({
                   </div>
                 </div>
                 <div className="flex justify-center">
-                  <div className="border border-gray text-default opacity-80 flex justify-center items-center w-20 h-8 rounded cursor-default hover:text-brandPrimary hover:border-brandPrimary">View</div>
+                  <div className="border border-gray text-default opacity-80 flex justify-center items-center w-20 h-8 rounded cursor-default hover:text-brandPrimary hover:border-brandPrimary"
+                  onClick={() => {
+                    setAccountStore(state => {
+                      state.nowAgreement = contract
+                    })
+                    setAppStore(state => {
+                      state.menuIndex = 5
+                    })
+                  }}>View</div>
                 </div>
               </div>
               <div className="pr-6 pt-7 pb-7  w-1/2 text-sm relative contract-item-text">

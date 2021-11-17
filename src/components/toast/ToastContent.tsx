@@ -21,7 +21,7 @@ const getIcon = (type: ToastTypes = ToastTypes.INFO) => {
     case ToastTypes.FAILURE:
       return <XCircleIcon />
     case ToastTypes.WARNING:
-      return <ExclamationCircleIcon />
+      return <ExclamationCircleIcon style={{fill: 'red'}} />
     case ToastTypes.SUCCESS:
       return <CheckCircleIcon />
     case ToastTypes.INFO:
@@ -44,7 +44,7 @@ const ToastContent: React.FC<ToastContentProps> = ({
 
   return (
     <div
-      className="toast-shadow rounded bg-white p-4 text-sm flex flex-col"
+      className="toast-shadow rounded bg-black p-4 text-sm flex flex-col"
       key={nextId()}
     >
       <div className="absolute -right-2 -top-2">
@@ -53,13 +53,13 @@ const ToastContent: React.FC<ToastContentProps> = ({
           className="bg-brandPrimary p-1 text-white rounded-full inline-flex outline-none focus:outline-none"
         >
           <span className="sr-only">Close</span>
-          <XIcon className="w-5 h-5" />
+          <XIcon className="w-5 h-5 text-black" />
         </button>
       </div>
       <div className="flex flex-row items-center">
         <div
           className={classNames(
-            'text-white text-xs h-7 w-7 mr-3 rounded-full flex-grow-0 flex-shrink-0 flex items-center justify-center',
+            ' text-brandPrimary text-xs h-7 w-7 mr-3 rounded-full flex-grow-0 flex-shrink-0 flex items-center justify-center',
             {
               'bg-success': type === ToastTypes.SUCCESS,
               'bg-failure': type === ToastTypes.FAILURE,

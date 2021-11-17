@@ -7,7 +7,7 @@ export const ReviewSend: React.FC<any> = (props) => {
 
   return (
     <div className="w-full flex justify-center ">
-      <div className="w-full max-w-4xl mb-24 flex flex-col overflow-hidden custom-pdf-signer mt-4">
+      <div className="w-full max-w-4xl mb-24 flex flex-col overflow-hidden custom-pdf-signer mt-5">
         <div className="w-full flex items-center font-semibold pl-4 relative custom-signer-title">
           Review and Send
         </div>

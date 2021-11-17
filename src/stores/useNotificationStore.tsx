@@ -33,14 +33,6 @@ export function notify(newNotification: {
   // Add Actions if have txid
   let toastAction: ToastAction | undefined
   const txid = newNotification.txid
-  if (txid) {
-    toastAction = {
-      text: `View transaction ${txid.slice(0, 8)}...${txid.slice(
-        txid.length - 8
-      )}`,
-      url: `https://explorer.solana.com/tx/${txid}`,
-    }
-  }
 
   let type = ToastTypes.INFO
   switch (newNotification.type) {

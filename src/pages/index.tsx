@@ -8,6 +8,7 @@ import useAccountStore from '../stores/useAccountStore'
 import { MainLeft } from '../components/main/MainLeft'
 import { MainRight } from '../components/main/MainRight'
 import { NewContract } from '../components/new-contract/index'
+import { SignPdf } from '../components/new-contract/SignPdf'
 import useAppStore from '../stores/useAppStore'
 
 
@@ -40,9 +41,13 @@ const Page: React.FC = () => {
     async function enable() {
       injectedWeb3 = await import('@polkadot/extension-dapp');
       await actions.accountInit(injectedWeb3)
+      const fileResult = await actionsApp.fleekGet('abc.txt')
+      console.log(fileResult)
+      // actions.attachResourceToAgreement('11', fileResult.hash, fileResult.publicUrl, res => {
+      //   console.log(res)
+      // })
     }
     enable()
-    actionsApp.fleekGet('ERC20.pdf')
   }, [])
   return (
     <div className="min-h-screen flex flex-col custom-h">
@@ -50,6 +55,7 @@ const Page: React.FC = () => {
       <div className=" pt-20 pb-4 w-full flex justify-center custom-h">
         {menuIndex < 4 && <Main />}
         {menuIndex === 4 && <NewContract />}
+        {menuIndex === 5 && <SignPdf />}
 
       </div>
     </div>

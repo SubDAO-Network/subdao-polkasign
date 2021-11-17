@@ -33,13 +33,14 @@ See https://github.com/adobe-type-tools/cmap-resources
 
 <!-- This snippet is used in production (included from viewer.html) -->
 <link rel="resource" type="application/l10n" href="locale/locale.properties">
+<link rel="stylesheet" href="//apps.bdimg.com/libs/jqueryui/1.10.4/css/jquery-ui.min.css">
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="jq-signature.min.js"></script>
+<script src="jquery-ui.min.js"></script>
+<script src="drag.js"></script>
 <script src="../build/pdf.js"></script>
 
-<link rel="stylesheet" href="//apps.bdimg.com/libs/jqueryui/1.10.4/css/jquery-ui.min.css">
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="jq-signature.min.js"></script>
-    <script src="jquery-ui.min.js"></script>
-    <script src="drag.js"></script>
+
   <script src="viewer.js"></script>
 
   </head>
@@ -57,10 +58,10 @@ See https://github.com/adobe-type-tools/cmap-resources
               <button id="viewOutline" class="toolbarButton" title="Show Document Outline (double-click to expand/collapse all items)" tabindex="3" data-l10n-id="document_outline">
                  <span data-l10n-id="document_outline_label">Document Outline</span>
               </button>
-              <button id="viewAttachments" class="toolbarButton" title="Show Attachments" tabindex="4" data-l10n-id="attachments">
+              <button style="height: 0; width: 0; overflow: hidden;" id="viewAttachments" class="toolbarButton" title="Show Attachments" tabindex="4" data-l10n-id="attachments">
                  <span data-l10n-id="attachments_label">Attachments</span>
               </button>
-              <button id="viewLayers" class="toolbarButton" title="Show Layers (double-click to reset all layers to the default state)" tabindex="5" data-l10n-id="layers">
+              <button style="height: 0; width: 0; overflow: hidden;" id="viewLayers" class="toolbarButton" title="Show Layers (double-click to reset all layers to the default state)" tabindex="5" data-l10n-id="layers">
                  <span data-l10n-id="layers_label">Layers</span>
               </button>
             </div>
@@ -213,7 +214,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                   <span data-l10n-id="toggle_sidebar_label">Toggle Sidebar</span>
                 </button>
                 <div class="toolbarButtonSpacer"></div>
-                <button id="viewFind" class="toolbarButton" title="Find in Document" tabindex="12" data-l10n-id="findbar" aria-expanded="false" aria-controls="findbar">
+                <button id="viewFind" style="width: 0; height: 0;overflow: hidden;" class="toolbarButton" title="Find in Document" tabindex="12" data-l10n-id="findbar" aria-expanded="false" aria-controls="findbar">
                   <span data-l10n-id="findbar_label">Find</span>
                 </button>
                 <div class="splitToolbarButton hiddenSmallView">

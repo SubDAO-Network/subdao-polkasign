@@ -635,30 +635,7 @@ const PDFViewerApplication = {
       return;
     }
 
-    try {
-      const styleSheet = document.styleSheets[0];
-      const cssRules = styleSheet?.cssRules || [];
-
-      for (let i = 0, ii = cssRules.length; i < ii; i++) {
-        const rule = cssRules[i];
-
-        if (rule instanceof CSSMediaRule && rule.media?.[0] === "(prefers-color-scheme: dark)") {
-          if (cssTheme === ViewerCssTheme.LIGHT) {
-            styleSheet.deleteRule(i);
-            return;
-          }
-
-          const darkRules = /^@media \(prefers-color-scheme: dark\) {\n\s*([\w\s-.,:;/\\{}()]+)\n}$/.exec(rule.cssText);
-
-          if (darkRules?.[1]) {
-            styleSheet.deleteRule(i);
-            styleSheet.insertRule(darkRules[1], i);
-          }
-
-          return;
-        }
-      }
-    } catch (reason) {
+    try {} catch (reason) {
       console.error(`_forceCssTheme: "${reason?.message}".`);
     }
   },
@@ -1285,27 +1262,74 @@ const PDFViewerApplication = {
 
           window.showSignature = function () {
             var nowPages = $('[data-page-number="' + PDFViewerApplication.page + '"]');
-            $(nowPages[1]).append('<div id="page-mask"></div>');
-            $('#page-mask').on('click', function (e) {
+            var signatureLen = $('.base64-wrap').length;
+            $(nowPages[1]).append(`<div class="page-mask" id="page-mask-${signatureLen}"><img class="page-mask-del" id="page-mask-del-${signatureLen}" src="images/del.svg" /></div>`);
+            $(`#page-mask-del-${signatureLen}`).on('click', function () {
+              $(`#page-mask-${signatureLen}`).remove();
+              return false;
+            });
+            $(`#page-mask-${signatureLen}`).on('click', function (e) {
               e.stopPropagation();
 
-              if ($('#signature').length > 0) {
+              if ($(`#signature-${signatureLen}`).length) {
                 return;
               }
 
-              $(this).append('<div id="signature-wrap">  <div id="signature"></div></div>');
-              $('#signature-wrap').css({
+              var $this = $(this);
+              $(this).append(`
+                <div class="signature-wrap" id="signature-wrap-${signatureLen}">
+                  <img class="signature-del" id="signature-del-${signatureLen}" src="images/del.svg" />
+                  <img class="signature-save" id="signature-save-${signatureLen}" src="images/ok.svg" />
+                  <div class="signature" id="signature-${signatureLen}"></div>
+                </div>`);
+              $(`#signature-wrap-${signatureLen}`).css({
                 left: e.offsetX + 'px',
                 top: e.offsetY + 'px'
               });
-              $('#signature').jqSignature({
+              $(`#signature-${signatureLen}`).jqSignature({
                 autoFit: true
               });
-              $("#signature-wrap").resizable(function (e) {
+              $(`#signature-wrap-${signatureLen}`).resizable(function (e) {
                 console.log(e);
               });
-              $("#signature-wrap").resize(function (e) {
-                $('#signature').jqSignature("clearCanvas");
+              $(`#signature-wrap-${signatureLen}`).resize(function (e) {
+                $(`#signature-${signatureLen}`).jqSignature("clearCanvas");
+              });
+              $(`#signature-save-${signatureLen}`).on('click', function () {
+                var base64 = $(`#signature-${signatureLen}`).jqSignature("getDataURL");
+                $(`#page-mask-${signatureLen}`).remove();
+                $(nowPages[1]).append(`
+                  <div class="base64-wrap" id="base64-wrap-${signatureLen}">
+                    <img class="signature-remove" id="signature-remove-${signatureLen}" src="images/del.svg" />
+                    <div>
+                      <img class="base64" id="js-base64-${signatureLen}" src="${base64}" />
+                    </div>
+                  </div>`);
+                $(`#base64-wrap-${signatureLen}`).css({
+                  left: e.offsetX + 'px',
+                  top: e.offsetY + 'px'
+                });
+                $(`#signature-remove-${signatureLen}`).on('click', function () {
+                  $(`#base64-wrap-${signatureLen}`).remove();
+                  window.signatureList.splice(signatureLen, 1);
+                });
+
+                if (!window.signatureList) {
+                  window.signatureList = [];
+                }
+
+                window.signatureList.push({
+                  left: e.offsetX,
+                  top: e.offsetY,
+                  base64: base64,
+                  page: PDFViewerApplication.page
+                });
+                window.parent.signatureList = window.signatureList;
+                return false;
+              });
+              $(`#signature-del-${signatureLen}`).on('click', function () {
+                $(`#signature-wrap-${signatureLen}`).remove();
+                return false;
               });
             });
           };
@@ -3189,7 +3213,7 @@ exports.scrollIntoView = scrollIntoView;
 exports.waitOnEventOrTimeout = waitOnEventOrTimeout;
 exports.watchScroll = watchScroll;
 exports.WaitOnType = exports.VERTICAL_PADDING = exports.UNKNOWN_SCALE = exports.TextLayerMode = exports.SpreadMode = exports.SidebarView = exports.ScrollMode = exports.SCROLLBAR_PADDING = exports.RendererType = exports.ProgressBar = exports.PresentationModeState = exports.MIN_SCALE = exports.MAX_SCALE = exports.MAX_AUTO_SCALE = exports.EventBus = exports.DEFAULT_SCALE_VALUE = exports.DEFAULT_SCALE_DELTA = exports.DEFAULT_SCALE = exports.AutoPrintRegExp = exports.AutomationEventBus = exports.animationStarted = void 0;
-const DEFAULT_SCALE_VALUE = "auto";
+const DEFAULT_SCALE_VALUE = "page-fit";
 exports.DEFAULT_SCALE_VALUE = DEFAULT_SCALE_VALUE;
 const DEFAULT_SCALE = 1.0;
 exports.DEFAULT_SCALE = DEFAULT_SCALE;

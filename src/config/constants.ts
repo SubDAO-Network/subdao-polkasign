@@ -8,7 +8,7 @@ export default {
     1: '0x10f60aF5585169B506847A191B12f364846aa69b',
   },
   sign: {
-    5: '5HiyrJvunh4KU4W67XADHRhdPppvBFBKqPS1GKC1zoEfzAvg',
+    5: '5Ds3sspdMLGo5YHa6pbKhMAm2N9b5Re89ZucZRBYW3XD7D6a',
     1: ''
   }
 }

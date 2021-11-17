@@ -41,7 +41,7 @@ const Button = <E extends ElementType = 'button'>(
             variant === variants.PRIMARY,
           'bg-brandSecondary hover:bg-brandSecondaryHover':
             variant === variants.SECONDARY,
-          'custom-btn-gray hover:opacity-60':
+          'custom-btn-gray':
             variant === variants.SUBTLE,
           'bg-failure hover:bg-failureHover': variant === variants.DANGER,
           'bg-disabled hover:bg-disabled active:shadow-none cursor-now-allowed remove-active-effect':

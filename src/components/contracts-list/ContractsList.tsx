@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { Pagination } from 'antd';
 import { ContractItem } from './ContractItem'
+import { NoData } from '../main/NoData'
 import { ButtonMenu, ButtonMenuItem } from '../menu'
 import useAccountStore from '../../stores/useAccountStore'
 
@@ -12,7 +13,7 @@ export const ContractsList: React.FC = () => {
   const contractsList = useAccountStore((s) => s.contractsList)
   const account = useAccountStore((s) => s.account)
   const defaultPageSize = 5
-
+  console.log(contractsList)
   const handleChangeMode = useCallback(
     (value: number) => {
       setIsDeposit(value === 0)
@@ -36,7 +37,10 @@ export const ContractsList: React.FC = () => {
       <div className="custom-shadow2 bg-black rounded-2xl custom-contract-list">
         <div>
         {
-          contractsList.map(contract => <ContractItem key={contract.index} contract={contract} />)
+          contractsList.length > 0 && contractsList.map(contract => <ContractItem key={contract.index} contract={contract} />)
+        }
+        {
+          contractsList.length <= 0 && <NoData />
         }
         </div>
 

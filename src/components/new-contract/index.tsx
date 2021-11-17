@@ -10,6 +10,8 @@ import { AddSigner } from '../../components/add-signer';
 import { ReviewSend } from './ReviewSend'
 import useModal from '../../hooks/useModal'
 import { ReviewSendTip } from './ReviewSendTip'
+import { notify } from '../../stores/useNotificationStore';
+import { isValidAddressPolkadotAddress } from '../../utils/contractHelpers'
 
 const { Dragger } = Upload;
 
@@ -64,35 +66,51 @@ export const NewContract: React.FC = () => {
     setAccountStore(state => {
       state.createStep = 2
     })
+    // const { hash, publicUrl } = await appActions.fleekUpload(new Blob(['abcdefg']) as File)
+    // let tmpFile = new Blob([JSON.stringify({top: 100, left: 100, content: 'abcd'})]) as any
+    // tmpFile.name = 'abc.txt'
     const { hash, publicUrl } = await appActions.fleekUpload(file)
     setAccountStore(state => {
       state.createStep = 3
     })
     // 2.
-    const res = await accountActions.createAgreement(fileInfo.name, nowSigners.map(signer => signer.address), hash, publicUrl,
-      result => {
-        if (result.status.isInBlock) {
-          console.log('in a block')
-          setAccountStore(state => {
-            state.createStep = 4
-          })
-        } else if (result.status.isFinalized) {
-          console.log('isFinalized')
-          setAccountStore(state => {
-            state.createStep = 5
-          })
-          setTimeout(() => {
-            onDismiss()
-            setAppStore(state => {
-              state.menuIndex = 1
+    try {
+      const res = await accountActions.createAgreement(fileInfo.name, nowSigners.map(signer => signer.address), hash, publicUrl,
+        (err, result) => {
+          if(err) {
+            notify({
+              title: err,
             })
-          }, 1000)
-        } else {
+            onDismiss()
+            return;
+          }
+          if (result.status.isInBlock) {
+            console.log('in a block')
+            setAccountStore(state => {
+              state.createStep = 4
+            })
+          } else if (result.status.isFinalized) {
+            console.log('isFinalized')
+            setAccountStore(state => {
+              state.createStep = 5
+            })
+            setTimeout(() => {
+              onDismiss()
+              setAppStore(state => {
+                state.menuIndex = 1
+              })
+            }, 1000)
+          } else {
 
+          }
         }
-      }
-    )
+      )
+    } catch(err) {
+      console.log(err)
+    }
     setStep(4)
+
+
   }
 
   return (
@@ -100,7 +118,7 @@ export const NewContract: React.FC = () => {
       {nowState === 1 && <div className="box-border pb-4 w-full flex justify-center">
         <div className="rounded-2xl custom-shadow2 custom-upload-wrap mt-5">
           <div className="flex items-center h-16 font-semibold pl-5 border-b custom-border-color2">New Contract</div>
-          <div className="pl-5 pr-5 pt-10 pb-10 bg-black flex flex-col">
+          <div className="rounded-b-2xl pl-5 pr-5 pt-10 pb-10 bg-black flex flex-col">
             <div className="flex flex-col justify-center items-center custom-upload-content">
               <Dragger {...props}>
                 <div className="flex flex-col justify-center items-center">
@@ -192,7 +210,7 @@ export const NewContract: React.FC = () => {
           }
           {
             nowState > 1 && <Button variant="subtle" className="mr-6" onClick={() => {
-              setNowState(1)
+              setNowState(nowState - 1)
             }}>Back</Button>
           }
           {
@@ -203,13 +221,20 @@ export const NewContract: React.FC = () => {
           }
           {
             nowState === 2 && <Button onClick={() => {
+              // 这里判断最近添加的一个签名人地址是否合法，不合法给提示，不让通过
+              if(!isValidAddressPolkadotAddress(nowSigners[nowSigners.length - 1].address)) {
+                notify({
+                  title: 'Address is not valid!'
+                })
+                return
+              }
               setNowState(3)
-            }}>Review</Button>
+            }}>Next</Button>
           }
           {
             nowState === 3 && <Button onClick={() => {
               setNowState(4)
-            }}>Next</Button>
+            }}>Review</Button>
           }
           {
             nowState === 4 && <Button onClick={() => {

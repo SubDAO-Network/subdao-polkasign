@@ -1,5 +1,7 @@
 import { ContractPromise } from '@polkadot/api-contract';
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
+import { decodeAddress, encodeAddress } from '@polkadot/keyring';
+import { hexToU8a, isHex } from '@polkadot/util';
 
 // Addresses
 import {
@@ -26,6 +28,21 @@ export const getPolkasignContract = async () => {
   const api = await getApi()
   return new ContractPromise(api, polkasignAbi, getSignAddress());
 }
+
+
+export const isValidAddressPolkadotAddress = (address) => {
+  try {
+    encodeAddress(
+      isHex(address)
+        ? hexToU8a(address)
+        : decodeAddress(address)
+    );
+
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
 
 
 

@@ -24,6 +24,8 @@ interface AccountStoreActions {
   fetchContracts: (page: number, pageSize: number) => Promise<void>,
   fetchContractsMy: (page: number, pageSize: number) => Promise<void>,
   createAgreement: (name: string, signers: Array<any>, hash: string, url: string, callback: any) => Promise<any>,
+  attachResourceToAgreement: (index: string, hash: string, url: string, callback: any) => Promise<any>,
+  attachResourceToAgreementWithSign: (index: string, hash: string, url: string, callback: any) => Promise<any>,
   fetchBlanceOf: (address: string) => Promise<void>,
   fetchIdoClaimed: (account: string) => Promise<void>,
 }
@@ -40,6 +42,7 @@ interface AccountStore extends State {
   createStep: number,
   contractListTotal: number,
   contractMyTotal: number,
+  nowAgreement: any,
   set: SetState<AccountStore>,
   actions: AccountStoreActions
 }
@@ -58,6 +61,7 @@ const useAccountStore = create<AccountStore>((set, get) => ({
   createStep: 1,
   contractListTotal: 0,
   contractMyTotal: 0,
+  nowAgreement: {},
   set: (fn: (s: AccountStore) => AccountStore) => set(produce(fn)),
   actions: {
     async accountInit(injectedWeb3) {
@@ -100,7 +104,7 @@ const useAccountStore = create<AccountStore>((set, get) => ({
         const outputData = output.toHuman() as any
         set((state) => {
           state.contractListTotal = outputData.total
-          state.contractsList = outputData.data.reverse().map(item => {
+          state.contractsList = outputData.data.map(item => {
             return {
               ...item,
               newDate: formatTime(item.createAt).format('h:mm a YYYY/MM/DD'),
@@ -127,12 +131,12 @@ const useAccountStore = create<AccountStore>((set, get) => ({
         const outputData = output.toHuman() as any
         set((state) => {
           state.contractMyTotal = outputData.total
-          state.contractsMyList = outputData.data.reverse().map((item, key) => {
+          state.contractsMyList = outputData.data.map((item, key) => {
             return {
               ...item,
               newDate: formatTime(item.createAt).format('h:mm a YYYY/MM/DD'),
               status: item.status * 1,
-              signtory: item.signs[account.address],
+              signtory: item.signers[account.address],
               key: key,
               founder: 'Me'
             }
@@ -143,7 +147,7 @@ const useAccountStore = create<AccountStore>((set, get) => ({
       }
     },
     async createAgreement(name, signers, hash, url, callback) {
-      const { account, accounts, injectedWeb3, allInjected, set } = get()
+      const { balanceOfSDT, account, accounts, injectedWeb3, allInjected, set } = get()
 
       const polkasignContract = await usePolkasignContract()
       const value = 0; // only useful on isPayable messages
@@ -156,22 +160,85 @@ const useAccountStore = create<AccountStore>((set, get) => ({
       //   type: 'bytes'
       // });
       // console.log(signature)
+      // String.fromCharCode.apply(null, [])
+
+      return new Promise(async resolve => {
+        try {
+          const tx = polkasignContract.tx
+            .createAgreement({ value, gasLimit },  {
+              name: name,
+              signers: [account.address, ...signers],
+              agreementFile: {
+                hash: hash,
+                creator: account.address,
+                usage: 'createAgreement',
+                saveAt: Date.now() / 1000,
+                url: url
+              }
+            })
+          const info = await tx.paymentInfo(account.address)
+          if(new BigNumber(balanceOfSDT).gt(new BigNumber(info.partialFee.toString()).div(new BigNumber(Math.pow(10, 12))))) {
+            tx.signAndSend(account.address, { signer: injector.signer }, (result) => {
+              callback(null, result)
+            });
+          } else {
+            callback('PartialFee is not enough')
+          }
+
+        } catch(err) {
+          console.log(err)
+        }
+
+      })
+    },
+    async attachResourceToAgreement(index, hash, url, callback) {
+      const { account, injectedWeb3 } = get()
+      const polkasignContract = await usePolkasignContract()
+      const value = 0; // only useful on isPayable messages
+      const gasLimit = -1;
+      const injector = await injectedWeb3.web3FromAddress(account.address);
+      console.log(index, hash, url, account.address, Date.now() / 1000)
+      return;
       return new Promise(resolve => {
         polkasignContract.tx
-          .createAgreement({ value, gasLimit },  {
-            name: name,
-            signers: [account.address, ...signers],
-            agreementFile: {
-              hash_: hash,
-              creator: account.address,
-              usage: 'createAgreement',
-              saveAt: Date.now() / 1000,
-              url: url
-            }
+          .attachResourceToAgreement({ value, gasLimit }, index, {
+            hash: hash,
+            creator: account.address,
+            usage: 'sign',
+            saveAt: Date.now() / 1000,
+            url: url
           })
           .signAndSend(account.address, { signer: injector.signer }, (result) => {
             callback(result)
-
+          });
+      })
+    },
+    async attachResourceToAgreementWithSign(index, hash, url, callback) {
+      const { account, injectedWeb3 } = get()
+      const polkasignContract = await usePolkasignContract()
+      const value = 0; // only useful on isPayable messages
+      const gasLimit = -1;
+      const injector = await injectedWeb3.web3FromAddress(account.address);
+      console.log(index, hash, url, account.address, Date.now() / 1000)
+      const signRaw = injector?.signer?.signRaw;
+      const { signature } = await signRaw({
+        address: account.address,
+        data: stringToHex(hash),
+        type: 'bytes'
+      });
+      console.log(11, stringToHex(hash), signature)
+      return
+      return new Promise(resolve => {
+        polkasignContract.tx
+          .attachResourceWithSign({ value, gasLimit }, Number(index), {
+            hash: hash,
+            creator: account.address,
+            usage: 'sign',
+            saveAt: Date.now() / 1000,
+            url: url
+          }, signature)
+          .signAndSend(account.address, { signer: injector.signer }, (result) => {
+            callback(result)
           });
       })
     },

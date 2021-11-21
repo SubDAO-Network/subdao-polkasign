@@ -1251,88 +1251,131 @@ const PDFViewerApplication = {
       this._contentLength = length;
       this.downloadComplete = true;
       this.loadingBar.hide();
+      window.haveShowPageList = '';
+
+      if (!localStorage.getItem('pdfjs.history')) {
+        document.querySelector('#sidebarToggle').click();
+      }
+
+      window.showHaveSignedList = function (page) {
+        var parentTimer = setInterval(() => {
+          if (window.haveSignedList) {
+            clearInterval(parentTimer);
+            var haveSignedList = window.haveSignedList || [];
+            var haveShowPageList = window.haveShowPageList || '';
+
+            if (haveShowPageList.indexOf(page) > -1) {
+              return;
+            }
+
+            window.haveShowPageList = haveShowPageList += page;
+            var nowPages = $('[data-page-number="' + page + '"]');
+            haveSignedList.forEach(function (haveSignd, index) {
+              if (haveSignd.page === page) {
+                var signatureLen = $('.base64-wrap').length;
+                $(nowPages[1]).append(`
+                  <div class="base64-wrap" id="base64-wrap-${signatureLen}">
+                    <div>
+                      <img class="base64" id="js-base64-${signatureLen}" src="${haveSignd.base64}" />
+                    </div>
+                  </div>`);
+                $(`#base64-wrap-${signatureLen}`).css({
+                  left: haveSignd.left + 'px',
+                  top: haveSignd.top + 'px'
+                });
+              }
+            });
+          }
+        }, 100);
+      };
+
+      window.showSignature = function () {
+        var nowPages = $('[data-page-number="' + PDFViewerApplication.page + '"]');
+        var signatureLen = $('.base64-wrap').length;
+        $(nowPages[1]).append(`<div class="page-mask" id="page-mask-${signatureLen}"><img class="page-mask-del" id="page-mask-del-${signatureLen}" src="images/del.svg" /></div>`);
+        $(`#page-mask-del-${signatureLen}`).on('click', function () {
+          $(`#page-mask-${signatureLen}`).remove();
+          return false;
+        });
+        $(`#page-mask-${signatureLen}`).on('click', function (e) {
+          e.stopPropagation();
+
+          if ($(`#signature-${signatureLen}`).length) {
+            return;
+          }
+
+          var $this = $(this);
+          $(this).append(`
+            <div class="signature-wrap" id="signature-wrap-${signatureLen}">
+              <img class="signature-del" id="signature-del-${signatureLen}" src="images/del.svg" />
+              <img class="signature-save" id="signature-save-${signatureLen}" src="images/ok.svg" />
+              <div class="signature" id="signature-${signatureLen}"></div>
+            </div>`);
+          $(`#signature-wrap-${signatureLen}`).css({
+            left: e.offsetX + 'px',
+            top: e.offsetY + 'px'
+          });
+          $(`#signature-${signatureLen}`).jqSignature({
+            autoFit: true
+          });
+          $(`#signature-wrap-${signatureLen}`).resizable(function (e) {
+            console.log(e);
+          });
+          $(`#signature-wrap-${signatureLen}`).resize(function (e) {
+            $(`#signature-${signatureLen}`).jqSignature("clearCanvas");
+          });
+          $(`#signature-save-${signatureLen}`).on('click', function () {
+            var base64 = $(`#signature-${signatureLen}`).jqSignature("getDataURL");
+            $(`#page-mask-${signatureLen}`).remove();
+            $(nowPages[1]).append(`
+              <div class="base64-wrap" id="base64-wrap-${signatureLen}">
+                <img class="signature-remove" id="signature-remove-${signatureLen}" src="images/del.svg" />
+                <div>
+                  <img class="base64" id="js-base64-${signatureLen}" src="${base64}" />
+                </div>
+              </div>`);
+            $(`#base64-wrap-${signatureLen}`).css({
+              left: e.offsetX + 'px',
+              top: e.offsetY + 'px'
+            });
+            $(`#signature-remove-${signatureLen}`).on('click', function () {
+              $(`#base64-wrap-${signatureLen}`).remove();
+              window.signatureList.splice(signatureLen, 1);
+              window.parent.signatureList = window.signatureList;
+              window.parent.getSignatureList && window.parent.getSignatureList(window.signatureList);
+            });
+
+            if (!window.signatureList) {
+              window.signatureList = [];
+            }
+
+            window.signatureList.push({
+              left: e.offsetX,
+              top: e.offsetY,
+              base64: base64,
+              page: PDFViewerApplication.page
+            });
+            window.parent.signatureList = window.signatureList;
+            window.parent.getSignatureList && window.parent.getSignatureList(window.signatureList);
+            return false;
+          });
+          $(`#signature-del-${signatureLen}`).on('click', function () {
+            $(`#signature-wrap-${signatureLen}`).remove();
+            return false;
+          });
+        });
+      };
+
+      window.gotoPageFrom = function (page) {
+        PDFViewerApplication.pdfLinkService.goToPage(page);
+      };
+
       firstPagePromise.then(() => {
         this.eventBus.dispatch("documentloaded", {
           source: this
         });
         setTimeout(() => {
-          if (!localStorage.getItem('pdfjs.history')) {
-            document.querySelector('#sidebarToggle').click();
-          }
-
-          window.showSignature = function () {
-            var nowPages = $('[data-page-number="' + PDFViewerApplication.page + '"]');
-            var signatureLen = $('.base64-wrap').length;
-            $(nowPages[1]).append(`<div class="page-mask" id="page-mask-${signatureLen}"><img class="page-mask-del" id="page-mask-del-${signatureLen}" src="images/del.svg" /></div>`);
-            $(`#page-mask-del-${signatureLen}`).on('click', function () {
-              $(`#page-mask-${signatureLen}`).remove();
-              return false;
-            });
-            $(`#page-mask-${signatureLen}`).on('click', function (e) {
-              e.stopPropagation();
-
-              if ($(`#signature-${signatureLen}`).length) {
-                return;
-              }
-
-              var $this = $(this);
-              $(this).append(`
-                <div class="signature-wrap" id="signature-wrap-${signatureLen}">
-                  <img class="signature-del" id="signature-del-${signatureLen}" src="images/del.svg" />
-                  <img class="signature-save" id="signature-save-${signatureLen}" src="images/ok.svg" />
-                  <div class="signature" id="signature-${signatureLen}"></div>
-                </div>`);
-              $(`#signature-wrap-${signatureLen}`).css({
-                left: e.offsetX + 'px',
-                top: e.offsetY + 'px'
-              });
-              $(`#signature-${signatureLen}`).jqSignature({
-                autoFit: true
-              });
-              $(`#signature-wrap-${signatureLen}`).resizable(function (e) {
-                console.log(e);
-              });
-              $(`#signature-wrap-${signatureLen}`).resize(function (e) {
-                $(`#signature-${signatureLen}`).jqSignature("clearCanvas");
-              });
-              $(`#signature-save-${signatureLen}`).on('click', function () {
-                var base64 = $(`#signature-${signatureLen}`).jqSignature("getDataURL");
-                $(`#page-mask-${signatureLen}`).remove();
-                $(nowPages[1]).append(`
-                  <div class="base64-wrap" id="base64-wrap-${signatureLen}">
-                    <img class="signature-remove" id="signature-remove-${signatureLen}" src="images/del.svg" />
-                    <div>
-                      <img class="base64" id="js-base64-${signatureLen}" src="${base64}" />
-                    </div>
-                  </div>`);
-                $(`#base64-wrap-${signatureLen}`).css({
-                  left: e.offsetX + 'px',
-                  top: e.offsetY + 'px'
-                });
-                $(`#signature-remove-${signatureLen}`).on('click', function () {
-                  $(`#base64-wrap-${signatureLen}`).remove();
-                  window.signatureList.splice(signatureLen, 1);
-                });
-
-                if (!window.signatureList) {
-                  window.signatureList = [];
-                }
-
-                window.signatureList.push({
-                  left: e.offsetX,
-                  top: e.offsetY,
-                  base64: base64,
-                  page: PDFViewerApplication.page
-                });
-                window.parent.signatureList = window.signatureList;
-                return false;
-              });
-              $(`#signature-del-${signatureLen}`).on('click', function () {
-                $(`#signature-wrap-${signatureLen}`).remove();
-                return false;
-              });
-            });
-          };
+          window.showHaveSignedList(1);
         }, 500);
       });
     });
@@ -2769,6 +2812,8 @@ function webViewerPageChanging({
   if (PDFViewerApplication.pdfSidebar.isThumbnailViewVisible) {
     PDFViewerApplication.pdfThumbnailViewer.scrollThumbnailIntoView(pageNumber);
   }
+
+  window.showHaveSignedList && window.showHaveSignedList(pageNumber);
 }
 
 function webViewerVisibilityChange(evt) {

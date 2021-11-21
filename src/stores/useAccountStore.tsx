@@ -105,10 +105,22 @@ const useAccountStore = create<AccountStore>((set, get) => ({
         set((state) => {
           state.contractListTotal = outputData.total
           state.contractsList = outputData.data.map(item => {
+            let waitSignInfos = []
+            let finishedSignInfos = []
+            item.signers.forEach(signer => {
+              if (!item.signInfos.find(signInfo => signInfo.addr === signer)) {
+                waitSignInfos.push(signer)
+              } else {
+                finishedSignInfos.push(signer)
+              }
+            })
             return {
               ...item,
               newDate: formatTime(item.createAt).format('h:mm a YYYY/MM/DD'),
-              status: item.status * 1
+              status: item.status * 1,
+              meSigned: item.signInfos.find(item => item.addr === account.address),
+              waitSignInfos,
+              finishedSignInfos
             }
           })
         })
@@ -219,22 +231,20 @@ const useAccountStore = create<AccountStore>((set, get) => ({
       const value = 0; // only useful on isPayable messages
       const gasLimit = -1;
       const injector = await injectedWeb3.web3FromAddress(account.address);
-      console.log(index, hash, url, account.address, Date.now() / 1000)
       const signRaw = injector?.signer?.signRaw;
       const { signature } = await signRaw({
         address: account.address,
         data: stringToHex(hash),
         type: 'bytes'
       });
-      console.log(11, stringToHex(hash), signature)
-      return
+
       return new Promise(resolve => {
         polkasignContract.tx
-          .attachResourceWithSign({ value, gasLimit }, Number(index), {
+          .attachResourceWithSign({ value, gasLimit }, index, {
             hash: hash,
             creator: account.address,
             usage: 'sign',
-            saveAt: Date.now() / 1000,
+            saveAt: Math.floor(Date.now() / 1000),
             url: url
           }, signature)
           .signAndSend(account.address, { signer: injector.signer }, (result) => {

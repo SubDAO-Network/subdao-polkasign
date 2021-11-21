@@ -20,7 +20,7 @@ export const SignPdf: React.FC = () => {
   const nowAgreement = useAccountStore((s) => s.nowAgreement)
   const { set: setAppStore } = useAppStore((state) => state)
   const { set: setAccountStore } = useAccountStore((state) => state)
-
+  console.log(nowAgreement)
   const [ isLoading, setIsLoading] = useState(true)
 
   const [ nowState, setNowState ] = useState(0)
@@ -47,13 +47,13 @@ export const SignPdf: React.FC = () => {
       state.createStep = 2
     })
     let tmpFile = new Blob([JSON.stringify(signatureData)]) as any
-    tmpFile.name = 'sign_info.txt'
+    tmpFile.name = `sign_info_${Date.now()}.txt`
     const { hash, publicUrl } = await appActions.fleekUpload(tmpFile)
     console.log(hash, publicUrl)
     setAccountStore(state => {
       state.createStep = 3
     })
-    accountActions.attachResourceToAgreementWithSign('3', 'bafybeih2j3lljld2idmjviarnd3r4sj', publicUrl,
+    accountActions.attachResourceToAgreementWithSign(nowAgreement.index, nowAgreement.agreementFile.hash_, publicUrl,
       result => {
         if (result.status.isInBlock) {
           console.log('in a block')
@@ -118,11 +118,13 @@ export const SignPdf: React.FC = () => {
                 state.menuIndex = 1
               })
             }}>Cancel</Button>
-          <Button onClick={() => {
+          {
+            !nowAgreement.meSigned &&
+              <Button onClick={() => {
+                overSend()
+              }}>Send</Button>
+          }
 
-              // appActions.fleekUpload(file)
-              overSend()
-            }}>Send</Button>
         </div>
       </div>
     </div>

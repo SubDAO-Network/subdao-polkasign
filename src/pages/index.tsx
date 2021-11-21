@@ -41,8 +41,8 @@ const Page: React.FC = () => {
     async function enable() {
       injectedWeb3 = await import('@polkadot/extension-dapp');
       await actions.accountInit(injectedWeb3)
-      const fileResult = await actionsApp.fleekGet('abc.txt')
-      console.log(fileResult)
+      // const fileResult = await actionsApp.fleekGet('abc.txt')
+      // console.log(fileResult)
       // actions.attachResourceToAgreement('11', fileResult.hash, fileResult.publicUrl, res => {
       //   console.log(res)
       // })

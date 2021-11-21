@@ -222,7 +222,7 @@ export const NewContract: React.FC = () => {
           {
             nowState === 2 && <Button onClick={() => {
               // 这里判断最近添加的一个签名人地址是否合法，不合法给提示，不让通过
-              if(!isValidAddressPolkadotAddress(nowSigners[nowSigners.length - 1].address)) {
+              if(!nowSigners[nowSigners.length - 1] || !isValidAddressPolkadotAddress(nowSigners[nowSigners.length - 1].address)) {
                 notify({
                   title: 'Address is not valid!'
                 })

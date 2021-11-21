@@ -90,16 +90,16 @@ export const ContractItem: React.FC<ContractItemProps> = ({
                     <img src="/images/icons/contract_gray.png" className="w-6 h-6 mr-3" alt="" />
                     Waiting
                   </div>
-                  {contract.signers.map(signer => <div key={signer} className="opacity-80 mb-3 pl-9">{signer}</div>)}
+                  {contract.waitSignInfos.map(signer => <div key={signer} className="opacity-80 mb-3 pl-9">{signer}</div>)}
                   {/* <div className="opacity-80 mb-3 pl-5">5FCQ2wm6eSh5FCQ2wm6eSh5FCQ2wm6eSh</div>
                   <div className="opacity-80 mb-5 pl-5">5FCQ2wm6eSh5FCQ2wm6eSh5FCQ2wm6eS2wm6eSh...</div> */}
+
                 </div>
                 <div className="mb-4 font-semibold custom-color-green relative z-10 flex items-center">
                   <img src="/images/icons/contract_green.png" className="w-6 h-6 mr-3" alt="" />
                   Singed
                 </div>
-                {/* <div className="opacity-80 mb-3 pl-5">5FCQ2wm6eSh5FCQh</div>
-                <div className="opacity-80 mb-5 pl-5">5FCQ2wm6eSh5FCQ</div> */}
+                {contract.finishedSignInfos.map(signer => <div key={signer} className="opacity-80 mb-3 pl-9">{signer}</div>)}
 
               </div>
             </div>

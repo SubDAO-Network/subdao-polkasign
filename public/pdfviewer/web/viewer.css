@@ -2783,7 +2783,7 @@ html[dir="rtl"] #documentPropertiesOverlay .row > * {
 .base64-wrap{
   position: absolute;
   padding: 5px;
-  z-index: 9;
+  z-index: 99;
 }
 .base64-wrap div{
   background-color: #fff;

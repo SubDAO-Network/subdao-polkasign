@@ -483,6 +483,8 @@ body {
   height: 100%;
 }
 .custom-pdf-right{
+  height: 100%;
+  overflow: auto;
   width: 300px;
   background-color: #ffffff;
 }
@@ -547,4 +549,10 @@ body {
 }
 .ant-message .anticon{
   top: 0;
+}
+.custom-signture-item{
+  border-color: #CED1D9;
+  &.active{
+    border-color: #B7095F;
+  }
 }

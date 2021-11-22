@@ -226,7 +226,7 @@ const useAccountStore = create<AccountStore>((set, get) => ({
       })
     },
     async attachResourceToAgreementWithSign(index, hash, url, callback) {
-      const { account, injectedWeb3 } = get()
+      const { account, balanceOfSDT, injectedWeb3 } = get()
       const polkasignContract = await usePolkasignContract()
       const value = 0; // only useful on isPayable messages
       const gasLimit = -1;
@@ -238,8 +238,8 @@ const useAccountStore = create<AccountStore>((set, get) => ({
         type: 'bytes'
       });
 
-      return new Promise(resolve => {
-        polkasignContract.tx
+      return new Promise(async resolve => {
+        const tx = polkasignContract.tx
           .attachResourceWithSign({ value, gasLimit }, index, {
             hash: hash,
             creator: account.address,
@@ -247,9 +247,14 @@ const useAccountStore = create<AccountStore>((set, get) => ({
             saveAt: Math.floor(Date.now() / 1000),
             url: url
           }, signature)
-          .signAndSend(account.address, { signer: injector.signer }, (result) => {
-            callback(result)
+        const info = await tx.paymentInfo(account.address)
+        if(new BigNumber(balanceOfSDT).gt(new BigNumber(info.partialFee.toString()).div(new BigNumber(Math.pow(10, 12))))) {
+          tx.signAndSend(account.address, { signer: injector.signer }, (result) => {
+            callback(null, result)
           });
+        } else {
+          callback('PartialFee is not enough')
+        }
       })
     },
     async fetchIdoClaimed(account) {

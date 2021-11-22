@@ -6,8 +6,10 @@ import useAppStore from '../../stores/useAppStore'
 export const ViewPdf: React.FC<any> = (props) => {
   const actionsApp = useAppStore((s) => s.actions)
   const nowAgreement = useAccountStore((s) => s.nowAgreement)
+  const account = useAccountStore((s) => s.account)
 
   const [signatureList, setSignatureList] = useState([]);
+  const [signatureListIframe, setSignatureListIframe] = useState([]);
   const [nowCount, setCount] = useState(1)
   const [nowSignture, setNowSignture] = useState(-1)
 
@@ -15,16 +17,19 @@ export const ViewPdf: React.FC<any> = (props) => {
     console.log(nowAgreement)
     const getResourcesInfo = async () => {
       let newResources = []
-      for(let k = 0; k < nowAgreement.resources.length; k++) {
-        const item = nowAgreement.resources[k]
-        const sourceKey = item.url.slice(item.url.lastIndexOf('/') + 1)
-        const fileResult = await actionsApp.fleekGet(sourceKey)
-        const signInfo = String.fromCharCode.apply(null, fileResult.data)
-        newResources.push({
-          ...item,
-          ...(JSON.parse(signInfo)[0] as any)
-        })
+      if (nowAgreement.resources) {
+        for(let k = 0; k < nowAgreement.resources.length; k++) {
+          const item = nowAgreement.resources[k]
+          const sourceKey = item.url.slice(item.url.lastIndexOf('/') + 1)
+          const fileResult = await actionsApp.fleekGet(sourceKey)
+          const signInfo = String.fromCharCode.apply(null, fileResult.data)
+          newResources.push({
+            ...item,
+            ...(JSON.parse(signInfo)[0] as any)
+          })
+        }
       }
+
       setSignatureList(newResources);
       console.log(newResources);
       (document.querySelector('#iframe') as any).contentWindow.haveSignedList = newResources
@@ -34,18 +39,26 @@ export const ViewPdf: React.FC<any> = (props) => {
 
   useEffect(() => {
     (window as any).getSignatureList = function(e) {
-      setSignatureList(e)
+      setSignatureListIframe(e)
     }
     const timer = setInterval(() => {
       setCount(Date.now())
-
     }, 500)
     return () => {
       clearInterval(timer)
     }
   }, [])
 
-
+  useEffect(() => {
+    const newList = signatureListIframe.map(item => {
+      return {
+        ...item,
+        creator: account.address,
+        saveAt: new Date().getTime() / 1000
+      }
+    })
+    setSignatureList([...newList, ...signatureList]);
+  }, [signatureListIframe])
 
   return (
     <div className="w-full custom-view-pdf flex">
@@ -79,10 +92,10 @@ export const ViewPdf: React.FC<any> = (props) => {
               >
                 <div className="text-md">Page {item.page}</div>
                 {
-                  item.creator && <div className=" text-base my-2">{item.creator.slice(0, 8) + '...' + item.creator.slice(36)}</div>
+                  item.creator && <div className={`text-base my-2 ${item.creator === account.address ? 'text-brandPrimary': ''}`}>{item.creator.slice(0, 8) + '...' + item.creator.slice(36)}</div>
                 }
 
-                <div className=" text-sm opacity-60">{moment.unix(item.saveAt * 1).format('h:mm a YYYY/MM/DD')}</div>
+                <div className=" text-sm opacity-60">{item.saveAt && moment.unix(item.saveAt * 1).format('h:mm a YYYY/MM/DD')}</div>
               </div>)
             }
           </div>

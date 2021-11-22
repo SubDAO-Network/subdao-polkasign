@@ -2,6 +2,7 @@ import { useWeb3React } from '@web3-react/core'
 import classNames from 'classnames'
 import React, { useCallback, useEffect } from 'react'
 import useAccountStore from '../../stores/useAccountStore'
+import useAppStore from '../../stores/useAppStore'
 
 export const ConnectWallet: React.FC<any> = ({
   className,
@@ -12,6 +13,7 @@ export const ConnectWallet: React.FC<any> = ({
   const actions = useAccountStore((s) => s.actions)
   const accounts = useAccountStore((s) => s.accounts)
   const account = useAccountStore((s) => s.account)
+  const menuIndex = useAppStore((s) => s.menuIndex)
 
   const connectPolkadot = useCallback(() => {
     async function enable() {
@@ -25,7 +27,7 @@ export const ConnectWallet: React.FC<any> = ({
 
   return (
     <div className="flex items-center">
-      <select className=" h-9 border border-gray rounded text-default appearance-none bg-transparent pl-4 font-medium custom-address-select"
+      <select disabled={menuIndex < 4 ? false : true} className=" h-9 border border-gray rounded text-default appearance-none bg-transparent pl-4 font-medium custom-address-select"
         onChange={(e) => {
           actions.changeAccount(e.target.value)
         }}

@@ -43,6 +43,7 @@ export const SignPdf: React.FC = () => {
       })
       return;
     }
+    onPresentConnectWallet()
     setAccountStore(state => {
       state.createStep = 2
     })
@@ -54,7 +55,14 @@ export const SignPdf: React.FC = () => {
       state.createStep = 3
     })
     accountActions.attachResourceToAgreementWithSign(nowAgreement.index, nowAgreement.agreementFile.hash_, publicUrl,
-      result => {
+      (err, result) => {
+        if(err) {
+          notify({
+            title: err,
+          })
+          onDismiss()
+          return;
+        }
         if (result.status.isInBlock) {
           console.log('in a block')
           setAccountStore(state => {

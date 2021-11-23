@@ -1,10 +1,8 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState } from 'react'
 import useAccountStore from '../../stores/useAccountStore'
 
 export const AddSigner: React.FC<any> = (props) => {
   const account = useAccountStore((state) => state.account)
-  const { set: setAccountStore } = useAccountStore((state) => state)
-
   const [newSigners, setNewSigners] = useState([])
 
   useEffect(() => {

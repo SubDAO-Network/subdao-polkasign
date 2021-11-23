@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react'
 import { XIcon } from '@heroicons/react/solid'
+import React from 'react'
 
 export const ReviewSend: React.FC<any> = (props) => {
   const { nowItem } = props

@@ -1,6 +1,4 @@
-import { useWeb3React } from '@web3-react/core'
-import classNames from 'classnames'
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback } from 'react'
 import useAccountStore from '../../stores/useAccountStore'
 import useAppStore from '../../stores/useAppStore'
 

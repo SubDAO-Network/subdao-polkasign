@@ -1,8 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import Skeleton from 'react-loading-skeleton'
-import moment from 'moment'
-
-import { Footer } from '../components/footer'
 import { Header } from '../components/header'
 import useAccountStore from '../stores/useAccountStore'
 import { MainLeft } from '../components/main/MainLeft'
@@ -27,9 +23,6 @@ const Page: React.FC = () => {
   const menuIndex = useAppStore(s => s.menuIndex)
   const actions = useAccountStore((s) => s.actions)
   const account = useAccountStore((s) => s.account)
-  const actionsApp = useAppStore((s) => s.actions)
-
-  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     if (account.address) {

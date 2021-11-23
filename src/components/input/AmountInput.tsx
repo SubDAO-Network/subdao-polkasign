@@ -5,7 +5,6 @@ import React, { useCallback } from 'react'
 import NumberFormat, { NumberFormatValues } from 'react-number-format'
 
 import SortDown from '../../../public/icons/sort-down.svg'
-import { CIcon } from '../icons'
 import PercentButton from '../percent-button'
 import { Spinner } from '../spinner'
 
@@ -61,7 +60,6 @@ export const AmountInput: React.FC<AmountInputProps> = ({
   maxIsLoading,
   maxIsRefreshing,
   placeholder,
-  CIcon,
   tokenSymbol,
   tokenNameDetail = null,
   value,

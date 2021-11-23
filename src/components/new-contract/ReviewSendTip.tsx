@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState } from 'react'
 import useAccountStore from '../../stores/useAccountStore'
 
-export const ReviewSendTip: React.FC<any> = (props) => {
+export const ReviewSendTip: React.FC<any> = () => {
   const createStep = useAccountStore((state) => state.createStep)
   // const { step } =  props
   const [step, setStep] = useState(1)

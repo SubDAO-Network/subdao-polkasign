@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useState } from 'react'
 import classNames from 'classnames'
 import moment from 'moment'
 import CopyToClipboard from 'react-copy-to-clipboard';
-import { Toast } from 'antd-mobile';
 import { message } from 'antd'
 import useAppStore from '../../stores/useAppStore'
 import useAccountStore from '../../stores/useAccountStore'
@@ -58,9 +57,9 @@ export const ContractItem: React.FC<ContractItemProps> = ({
                 </div>
                 <div className="flex items-center w-full text-sm mb-5 truncate" style={{maxWidth: 332}}>
                   <div>
-                    <span className="font-semibold">File Hash：</span>  {contract.agreementFile.hash_}
+                    <span className="font-semibold">File Hash：</span>  {contract.agreement_file.hash_}
                   </div>
-                  <CopyToClipboard text={contract.agreementFile.hash_} onCopy={(e) => { message.success({content: '复制成功'}) }}
+                  <CopyToClipboard text={contract.agreement_file.hash_} onCopy={() => { message.success({content: 'Copy successfully'}) }}
                   >
                     <img src="/images/icons/copy.png" alt="Copy" className="inline-block w-4 h-4 ml-2" />
                   </CopyToClipboard>
@@ -68,7 +67,7 @@ export const ContractItem: React.FC<ContractItemProps> = ({
                 </div>
                 <div className="flex items-center text-sm mb-6">
                   <div>
-                    <span className="font-semibold">Created：</span>  {moment.unix(contract.agreementFile.saveAt * 1).format('h:mm a YYYY/MM/DD')}
+                    <span className="font-semibold">Created：</span>  {moment.unix(contract.agreement_file.saveAt * 1).format('h:mm a YYYY/MM/DD')}
                   </div>
                 </div>
                 <div className="flex justify-center">
@@ -90,7 +89,7 @@ export const ContractItem: React.FC<ContractItemProps> = ({
                     <img src="/images/icons/contract_gray.png" className="w-6 h-6 mr-3" alt="" />
                     Waiting
                   </div>
-                  {contract.waitSignInfos.map(signer => <div key={signer} className="opacity-80 mb-3 pl-9">{signer}</div>)}
+                  {contract.waitSignInfos.map(signer => signer ? <div key={signer} className="opacity-80 mb-3 pl-9">{signer}</div> : '')}
                   {/* <div className="opacity-80 mb-3 pl-5">5FCQ2wm6eSh5FCQ2wm6eSh5FCQ2wm6eSh</div>
                   <div className="opacity-80 mb-5 pl-5">5FCQ2wm6eSh5FCQ2wm6eSh5FCQ2wm6eS2wm6eSh...</div> */}
 
@@ -99,7 +98,7 @@ export const ContractItem: React.FC<ContractItemProps> = ({
                   <img src="/images/icons/contract_green.png" className="w-6 h-6 mr-3" alt="" />
                   Singed
                 </div>
-                {contract.finishedSignInfos.map(signer => <div key={signer} className="opacity-80 mb-3 pl-9">{signer}</div>)}
+                {contract.finishedSignInfos.map(signer => signer ? <div key={signer} className="opacity-80 mb-3 pl-9">{signer}</div> : '')}
 
               </div>
             </div>

@@ -13,7 +13,7 @@ interface AppStoreActions {
 
 interface AppStore extends State {
   menuIndex: number,
-
+  isQueue: number,
   set: SetState<AppStore>,
   actions: AppStoreActions
 }
@@ -21,6 +21,7 @@ interface AppStore extends State {
 
 const useAppStore = create<AppStore>((set, get) => ({
   menuIndex: 1,
+  isQueue: 0,
   set: (fn: (s: AppStore) => AppStore) => set(produce(fn)),
   actions: {
     async fleekUpload(file) {

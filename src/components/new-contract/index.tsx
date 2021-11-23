@@ -1,7 +1,4 @@
-import React, { useEffect, useState } from 'react'
-import classNames from 'classnames'
-import { Upload, message } from 'antd';
-
+import { Upload } from 'antd';
 import { Button } from '../../components/button';
 import { ViewPdf } from './ViewPdf'
 import useAccountStore from '../../stores/useAccountStore'
@@ -12,6 +9,8 @@ import useModal from '../../hooks/useModal'
 import { ReviewSendTip } from './ReviewSendTip'
 import { notify } from '../../stores/useNotificationStore';
 import { isValidAddressPolkadotAddress } from '../../utils/contractHelpers'
+import React, { useEffect, useState } from 'react'
+import classNames from 'classnames'
 
 const { Dragger } = Upload;
 
@@ -21,9 +20,6 @@ export const NewContract: React.FC = () => {
   const { set: setAppStore } = useAppStore((state) => state)
   const { set: setAccountStore } = useAccountStore((state) => state)
 
-  const [ isLoading, setIsLoading] = useState(true)
-
-  const [ current, setCurrent ] = useState(0)
   const [ nowState, setNowState ] = useState(0)
   const [ fileUrl, setFileUrl ] = useState('')
   const [ fileInfo, setFileInfo ] = useState({name: ''})

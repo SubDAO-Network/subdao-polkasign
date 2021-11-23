@@ -1,5 +1,4 @@
 import { Dialog } from '@headlessui/react'
-import { XIcon } from '@heroicons/react/solid'
 import React from 'react'
 
 interface ModalProps {

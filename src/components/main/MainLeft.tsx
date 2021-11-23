@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import NumberText from '../texts/Number'
 import useAppStore from '../../stores/useAppStore'
 import useAccountStore from '../../stores/useAccountStore'
+import NumberText from '../texts/Number'
 
 
 export const MainLeft: React.FC = () => {

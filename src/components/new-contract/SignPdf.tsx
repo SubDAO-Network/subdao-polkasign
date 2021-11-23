@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import classNames from 'classnames'
-import { Upload, message } from 'antd';
-
 import { Button } from '../button';
 import { ViewPdf } from './ViewPdf'
 import useAccountStore from '../../stores/useAccountStore'
 import useAppStore from '../../stores/useAppStore'
-import { AddSigner } from '../add-signer';
-import { ReviewSend } from './ReviewSend'
 import useModal from '../../hooks/useModal'
 import { ReviewSendTip } from './ReviewSendTip'
 import { notify } from '../../stores/useNotificationStore'
-
-const { Dragger } = Upload;
 
 export const SignPdf: React.FC = () => {
   const appActions = useAppStore((s) => s.actions)
@@ -21,8 +15,6 @@ export const SignPdf: React.FC = () => {
   const { set: setAppStore } = useAppStore((state) => state)
   const { set: setAccountStore } = useAccountStore((state) => state)
   console.log(nowAgreement)
-  const [ isLoading, setIsLoading] = useState(true)
-
   const [ nowState, setNowState ] = useState(0)
 
   const [step, setStep] = useState(1)
@@ -47,14 +39,14 @@ export const SignPdf: React.FC = () => {
     setAccountStore(state => {
       state.createStep = 2
     })
-    let tmpFile = new Blob([JSON.stringify(signatureData)]) as any
+    const tmpFile = new Blob([JSON.stringify(signatureData)]) as any
     tmpFile.name = `sign_info_${Date.now()}.txt`
     const { hash, publicUrl } = await appActions.fleekUpload(tmpFile)
     console.log(hash, publicUrl)
     setAccountStore(state => {
       state.createStep = 3
     })
-    accountActions.attachResourceToAgreementWithSign(nowAgreement.index, nowAgreement.agreementFile.hash_, publicUrl,
+    accountActions.attachResourceToAgreementWithSign(nowAgreement.index, nowAgreement.agreement_file.hash_, publicUrl,
       (err, result) => {
         if(err) {
           notify({
@@ -79,8 +71,6 @@ export const SignPdf: React.FC = () => {
               state.menuIndex = 1
             })
           }, 1000)
-        } else {
-
         }
       }
     )
@@ -93,7 +83,7 @@ export const SignPdf: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col ">
-      {nowAgreement.agreementFile && <ViewPdf fileUrl={nowAgreement.agreementFile.url} />}
+      {nowAgreement.agreement_file && <ViewPdf fileUrl={nowAgreement.agreement_file.url} />}
       <div className="fixed bottom-0 left-0 right-0 flex justify-center items-center h-20 bg-black border-t border-lightgray">
         <div className="custom-step flex ">
           <div className="custom-step-item flex items-center relative">

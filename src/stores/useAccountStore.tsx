@@ -7,6 +7,8 @@ import BigNumber from 'bignumber.js'
 import moment from 'moment'
 import { usePolkasignContract } from '../hooks/useContract'
 import { getApi } from '../utils/contractHelpers'
+import { client  } from '../apollo/client';
+import { GET_CONTRACTS_LIST } from '../apollo/queries';
 
 const formatTime = (timeStamp) => {
   const tmp = timeStamp.split(',').join('') / 1000
@@ -21,8 +23,8 @@ export interface Account {
 interface AccountStoreActions {
   accountInit: (injectedWeb3) => Promise<void>,
   changeAccount: (address: string) => Promise<void>,
-  fetchContracts: (page: number, pageSize: number) => Promise<void>,
-  fetchContractsMy: (page: number, pageSize: number) => Promise<void>,
+  fetchContracts: (creator: string, signer: string, status: string, page: number, size: number, order: string) => Promise<void>,
+  fetchContractsMy: (creator: string, signer: string, status: string, page: number, size: number, order: string) => Promise<void>,
   createAgreement: (name: string, signers: Array<any>, hash: string, url: string, callback: any) => Promise<any>,
   attachResourceToAgreement: (index: string, hash: string, url: string, callback: any) => Promise<any>,
   attachResourceToAgreementWithSign: (index: string, hash: string, url: string, callback: any) => Promise<any>,
@@ -89,26 +91,29 @@ const useAccountStore = create<AccountStore>((set, get) => ({
       })
       this.fetchBlanceOf(find.address)
     },
-    async fetchContracts(page, pageSize) {
+    async fetchContracts(creator = '', signer = '', status = "[2,1,0]", page = 0, size = 5, order = 'desc') {
       const { account, set } = get()
-      const polkasignContract = await usePolkasignContract()
-      const value = 0; // only useful on isPayable messages
-      const gasLimit = -1;
-      const { gasConsumed, result, output } = await polkasignContract.query.queryAgreementByCollaborator(
-        account.address,
-        { value, gasLimit },
-        account.address,
-        {pageIndex: page - 1, pageSize: pageSize},
-        );
-      if (result.isOk) {
-        const outputData = output.toHuman() as any
+      const res = await client.query({
+        query: GET_CONTRACTS_LIST(creator, signer, status, page, size, order),
+      })
+      if (res.data && res.data.agreementInfos) {
+        const agreementInfos = res.data.agreementInfos
         set((state) => {
-          state.contractListTotal = outputData.total
-          state.contractsList = outputData.data.map(item => {
+          state.contractListTotal = agreementInfos.total
+          const agreementInfosData = agreementInfos.data.map(item => {
+            return {
+              ...item,
+              agreement_file: JSON.parse(item.agreement_file),
+              resources: JSON.parse(item.resources),
+              sign_infos: JSON.parse(item.sign_infos),
+              signers: item.signers.split(','),
+            }
+          })
+          state.contractsList = agreementInfosData.map(item => {
             let waitSignInfos = []
             let finishedSignInfos = []
             item.signers.forEach(signer => {
-              if (!item.signInfos.find(signInfo => signInfo.addr === signer)) {
+              if (!item.sign_infos.find(signInfo => signInfo.addr === signer)) {
                 waitSignInfos.push(signer)
               } else {
                 finishedSignInfos.push(signer)
@@ -116,46 +121,46 @@ const useAccountStore = create<AccountStore>((set, get) => ({
             })
             return {
               ...item,
-              newDate: formatTime(item.createAt).format('h:mm a YYYY/MM/DD'),
+              newDate: formatTime(item.create_at).format('h:mm a YYYY/MM/DD'),
               status: item.status * 1,
-              meSigned: item.signInfos.find(item => item.addr === account.address),
+              meSigned: item.sign_infos.find(item => item.addr === account.address),
               waitSignInfos,
               finishedSignInfos
             }
           })
         })
-      } else {
-        console.error('Error', result.asErr);
       }
     },
-    async fetchContractsMy(page, pageSize) {
+    async fetchContractsMy(creator = '', signer = '', status = "[2,1,0]", page = 0, size = 5, order = 'desc') {
       const { account, set } = get()
-      const polkasignContract = await usePolkasignContract()
-      const value = 0; // only useful on isPayable messages
-      const gasLimit = -1;
-      const { gasConsumed, result, output } = await polkasignContract.query.queryAgreementByCreator(
-        account.address,
-        { value, gasLimit },
-        account.address,
-        {pageIndex: page - 1, pageSize: pageSize},
-        );
-      if (result.isOk) {
-        const outputData = output.toHuman() as any
+      const res = await client.query({
+        query: GET_CONTRACTS_LIST(creator, signer, status, page, size, order),
+      })
+      console.log(res, 333)
+      if (res.data && res.data.agreementInfos) {
+        const agreementInfos = res.data.agreementInfos
         set((state) => {
-          state.contractMyTotal = outputData.total
-          state.contractsMyList = outputData.data.map((item, key) => {
+          state.contractMyTotal = agreementInfos.total
+          const agreementInfosData = agreementInfos.data.map(item => {
             return {
               ...item,
-              newDate: formatTime(item.createAt).format('h:mm a YYYY/MM/DD'),
-              status: item.status * 1,
-              signtory: item.signers[account.address],
+              agreement_file: JSON.parse(item.agreement_file),
+              resources: JSON.parse(item.resources),
+              sign_infos: JSON.parse(item.sign_infos),
+              signers: item.signers.split(','),
+            }
+          })
+          state.contractsMyList = agreementInfosData.map((item, key) => {
+            return {
+              ...item,
+              newDate: formatTime(item.create_at).format('h:mm a YYYY/MM/DD'),
+              status: item.status,
+              signtory: item.sign_infos.find(item => item.addr === account.address),
               key: key,
               founder: 'Me'
             }
           })
         })
-      } else {
-        console.error('Error', result.asErr);
       }
     },
     async createAgreement(name, signers, hash, url, callback) {

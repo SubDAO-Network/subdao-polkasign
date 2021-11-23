@@ -1,12 +1,11 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import { Table, Tag, Space, Pagination, Select, Input } from 'antd';
+import React, { useEffect, useState } from 'react'
+import { Table, Space, Pagination, Select, Input } from 'antd';
 import { CIcon } from '../icons'
 import useModal from '../../hooks/useModal'
 import { ReviewSend } from '../../components/review-send';
 import useAccountStore from '../../stores/useAccountStore'
 
 const { Option } = Select;
-const { Search } = Input;
 
 interface DataType {
   key: React.Key;
@@ -26,9 +25,9 @@ export const MyContracts: React.FC = () => {
   const [onPresentConnectWallet, onDismiss] = useModal(<ReviewSend nowItem={nowItem} close={() => {
     onDismiss()
   }} />)
-
+  console.log(contractsMyList)
   useEffect(() => {
-    actions.fetchContractsMy(1, defaultPageSize)
+    actions.fetchContractsMy(account.address, '', '[2,1,0]', 0, defaultPageSize, 'desc')
   }, [account.address])
 
   const columns = [
@@ -45,7 +44,7 @@ export const MyContracts: React.FC = () => {
       render: (status, record) => {
         const stateText = record.signtory ? <span>Signed</span> : <span className="custom-color-green">Waiting</span>
         return (
-          <div>Waiting</div>
+          <div>{stateText}</div>
         )
       },
     },
@@ -74,42 +73,14 @@ export const MyContracts: React.FC = () => {
             setNowItem(record)
             onPresentConnectWallet()
           }} />
-          <CIcon icon="down" size="17" />
-          <CIcon icon="history" size="17" />
-          <CIcon icon="info" size="18" />
+          <CIcon icon="down" size="17" onClick={() => {
+            window.open(record.agreement_file.url)
+          }} />
+          {/* <CIcon icon="history" size="17" />
+          <CIcon icon="info" size="18" /> */}
 
         </Space>
       ),
-    },
-  ];
-
-  const data = [
-    {
-      key: '1',
-      name: 'I Invoice755105449.of',
-      status: 'Has been completed',
-      founder: '0665878sd8889',
-      signtory: 'Me',
-      signState: 0,
-      operation: ['nice', 'developer'],
-    },
-    {
-      key: '2',
-      name: 'I Invoice755105449.of',
-      status: 'Has been completed',
-      founder: '0665878sd8889',
-      signtory: 'Me',
-      signState: 0,
-      operation: ['loser'],
-    },
-    {
-      key: '3',
-      name: 'I Invoice755105449.of',
-      status: 'Has been completed',
-      founder: '0665878sd8889',
-      signtory: 'Me',
-      signState: 1,
-      operation: ['cool', 'teacher'],
     },
   ];
   const rowSelection = {
@@ -123,8 +94,8 @@ export const MyContracts: React.FC = () => {
   };
   function handleChange(value) {
     console.log(`selected ${value}`);
+    actions.fetchContractsMy(account.address, '', '[2,1,0]', 0, defaultPageSize, value)
   }
-  const onSearch = value => console.log(value);
   return (
     <div className="w-full custom-my-contracts">
 
@@ -132,15 +103,15 @@ export const MyContracts: React.FC = () => {
         <div className="flex items-center">
           <span className=" font-bold">I created</span>
           <img src="/images/icons/arrow-right.png" alt="" className="w-2 h-3 ml-3" />
-          <Select defaultValue="lucy" style={{ width: 80 }} onChange={handleChange}>
-            <Option value="jack">All</Option>
-            <Option value="lucy">Sort</Option>
-            <Option value="Yiminghe">Desc</Option>
+          <Select defaultValue="desc" style={{ width: 80 }} onChange={handleChange}>
+            {/* <Option value="jack">All</Option> */}
+            <Option value="asc">Sort</Option>
+            <Option value="desc">Desc</Option>
           </Select>
         </div>
-        <div className=" ml-24">
+        {/* <div className=" ml-24">
           <Search placeholder="Querying a File Name" onSearch={onSearch} style={{ width: 300 }} />
-        </div>
+        </div> */}
       </div>
       <div className=" custom-h rounded-2xl custom-shadow2 overflow-hidden bg-black custom-my-table">
         <Table
@@ -153,7 +124,7 @@ export const MyContracts: React.FC = () => {
           <Pagination
             total={contractMyTotal}
             onChange={(page, pageSize) => {
-              actions.fetchContractsMy(page, pageSize)
+              actions.fetchContractsMy('', account.address, '[2, 1,0]', page - 1, pageSize, 'desc')
             }}
             showSizeChanger
             showQuickJumper

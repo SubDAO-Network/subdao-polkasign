@@ -4,30 +4,44 @@ import { ContractItem } from './ContractItem'
 import { NoData } from '../main/NoData'
 import { ButtonMenu, ButtonMenuItem } from '../menu'
 import useAccountStore from '../../stores/useAccountStore'
+import useAppStore from '../../stores/useAppStore';
 
 export const ContractsList: React.FC = () => {
   const [isDeposit, setIsDeposit] = useState(true)
   const actions = useAccountStore((s) => s.actions)
+  const {set: setAppStore} = useAppStore((s) => s)
 
   const contractListTotal = useAccountStore((s) => s.contractListTotal)
   const contractsList = useAccountStore((s) => s.contractsList)
   const account = useAccountStore((s) => s.account)
+  const isQueue = useAppStore((s) => s.isQueue)
+
   const defaultPageSize = 5
   console.log(contractsList)
   const handleChangeMode = useCallback(
     (value: number) => {
       setIsDeposit(value === 0)
+      setAppStore(state => {
+        state.isQueue = value
+      })
+      if (value === 1) {
+        actions.fetchContracts('', account.address, '[2]', 0, defaultPageSize, 'desc')
+      } else {
+        actions.fetchContracts('', account.address, '[0,1]', 0, defaultPageSize, 'desc')
+      }
     },
     [setIsDeposit]
   )
   useEffect(() => {
-    actions.fetchContracts(1, defaultPageSize)
+    if (contractsList.length <= 0) {
+      actions.fetchContracts('', '', '[0]', 0, defaultPageSize, 'desc')
+    }
   }, [account.address])
   return (
     <div className="w-full relative" style={{height: '100%', overflow: 'auto'}}>
       <div className="mb-4 border-b-2" style={{borderColor: '#E1E4ED'}}>
         <ButtonMenu
-          activeIndex={isDeposit ? 0 : 1}
+          activeIndex={isQueue}
           onItemClick={handleChangeMode}
         >
           <ButtonMenuItem pos="left">Queue</ButtonMenuItem>
@@ -54,7 +68,8 @@ export const ContractsList: React.FC = () => {
         <Pagination
           total={contractListTotal}
           onChange={(page, pageSize) => {
-            actions.fetchContracts(page, pageSize)
+            console.log(page, pageSize)
+            actions.fetchContracts('', account.address, isQueue === 1 ? '[2]' : '[1,0]', page - 1, pageSize, 'desc')
           }}
           showSizeChanger
           showQuickJumper

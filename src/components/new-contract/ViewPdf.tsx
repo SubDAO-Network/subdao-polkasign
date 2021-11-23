@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 import useAccountStore from '../../stores/useAccountStore'
 import useAppStore from '../../stores/useAppStore'
@@ -16,7 +16,7 @@ export const ViewPdf: React.FC<any> = (props) => {
   useEffect(() => {
     console.log(nowAgreement)
     const getResourcesInfo = async () => {
-      let newResources = []
+      const newResources = []
       if (nowAgreement.resources) {
         for(let k = 0; k < nowAgreement.resources.length; k++) {
           const item = nowAgreement.resources[k]

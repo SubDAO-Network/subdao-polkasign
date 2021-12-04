@@ -38,7 +38,7 @@ export const AddSigner: React.FC<any> = (props) => {
                 const tmpArr = [...newSigners]
                 tmpArr[index].address = e.target.value
                 setNewSigners(tmpArr)
-              }} className="opacity-80 mt-2 bg-black h-9 px-4 leading-9 rounded-md w-96" placeholder="please fill the address to sign" />
+              }} className="opacity-80 mt-2 bg-black h-9 px-4 leading-9 rounded-md w-96" style={{width: '30rem'}} placeholder="please fill the address to sign" />
             </div>
           </div>)
         }

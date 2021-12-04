@@ -17,7 +17,6 @@ export const ContractsList: React.FC = () => {
   const isQueue = useAppStore((s) => s.isQueue)
 
   const defaultPageSize = 5
-  console.log(contractsList)
   const handleChangeMode = useCallback(
     (value: number) => {
       setIsDeposit(value === 0)
@@ -30,11 +29,12 @@ export const ContractsList: React.FC = () => {
         actions.fetchContracts('', account.address, '[0,1]', 0, defaultPageSize, 'desc')
       }
     },
-    [setIsDeposit]
+    [setIsDeposit, account]
   )
+
   useEffect(() => {
-    if (contractsList.length <= 0) {
-      actions.fetchContracts('', '', '[0]', 0, defaultPageSize, 'desc')
+    if (account.address) {
+      actions.fetchContracts('', account.address, '[0,1]', 0, defaultPageSize, 'desc')
     }
   }, [account.address])
   return (
@@ -68,7 +68,9 @@ export const ContractsList: React.FC = () => {
         <Pagination
           total={contractListTotal}
           onChange={(page, pageSize) => {
-            console.log(page, pageSize)
+            setAppStore(state => {
+              state.pageInfo = {page, pageSize}
+            })
             actions.fetchContracts('', account.address, isQueue === 1 ? '[2]' : '[1,0]', page - 1, pageSize, 'desc')
           }}
           showSizeChanger

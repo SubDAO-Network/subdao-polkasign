@@ -1292,6 +1292,7 @@ const PDFViewerApplication = {
       window.showSignature = function () {
         var nowPages = $('[data-page-number="' + PDFViewerApplication.page + '"]');
         var signatureLen = $('.base64-wrap').length;
+        if ($(`#page-mask-${signatureLen}`).length > 0) return;
         $(nowPages[1]).append(`<div class="page-mask" id="page-mask-${signatureLen}"><img class="page-mask-del" id="page-mask-del-${signatureLen}" src="images/del.svg" /></div>`);
         $(`#page-mask-del-${signatureLen}`).on('click', function () {
           $(`#page-mask-${signatureLen}`).remove();
@@ -1334,9 +1335,17 @@ const PDFViewerApplication = {
                   <img class="base64" id="js-base64-${signatureLen}" src="${base64}" />
                 </div>
               </div>`);
+            console.log(e.offsetX, e.offsetY);
             $(`#base64-wrap-${signatureLen}`).css({
               left: e.offsetX + 'px',
               top: e.offsetY + 'px'
+            });
+            $(`#base64-wrap-${signatureLen}`).Tdrag({
+              scope: '.page',
+              cbEnd: function () {
+                window.signatureList[signatureLen].left = parseInt($(`#base64-wrap-${signatureLen}`).css('left'));
+                window.signatureList[signatureLen].top = parseInt($(`#base64-wrap-${signatureLen}`).css('top'));
+              }
             });
             $(`#signature-remove-${signatureLen}`).on('click', function () {
               $(`#base64-wrap-${signatureLen}`).remove();

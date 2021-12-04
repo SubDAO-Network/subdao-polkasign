@@ -10,7 +10,9 @@ import { notify } from '../../stores/useNotificationStore'
 
 export const SignPdf: React.FC = () => {
   const appActions = useAppStore((s) => s.actions)
+  const pageInfo = useAppStore((s) => s.pageInfo)
   const accountActions = useAccountStore((s) => s.actions)
+  const account = useAccountStore((s) => s.account)
   const nowAgreement = useAccountStore((s) => s.nowAgreement)
   const { set: setAppStore } = useAppStore((state) => state)
   const { set: setAccountStore } = useAccountStore((state) => state)
@@ -70,6 +72,7 @@ export const SignPdf: React.FC = () => {
             setAppStore(state => {
               state.menuIndex = 1
             })
+            accountActions.fetchContracts('', account.address, "[1,0]", 0, 5, 'desc')
           }, 1000)
         }
       }

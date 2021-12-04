@@ -7,8 +7,8 @@ import BigNumber from 'bignumber.js'
 import moment from 'moment'
 import { usePolkasignContract } from '../hooks/useContract'
 import { getApi } from '../utils/contractHelpers'
-import { client  } from '../apollo/client';
-import { GET_CONTRACTS_LIST } from '../apollo/queries';
+import { client, clientMy } from '../apollo/client';
+import { GET_CONTRACTS_LIST, GET_CONTRACTS_LIST_MY } from '../apollo/queries';
 
 const formatTime = (timeStamp) => {
   const tmp = timeStamp.split(',').join('') / 1000
@@ -67,7 +67,7 @@ const useAccountStore = create<AccountStore>((set, get) => ({
   set: (fn: (s: AccountStore) => AccountStore) => set(produce(fn)),
   actions: {
     async accountInit(injectedWeb3) {
-      const { set } = get()
+      const { account, set } = get()
       set(state => {
         state.injectedWeb3 = injectedWeb3
       })
@@ -78,7 +78,7 @@ const useAccountStore = create<AccountStore>((set, get) => ({
       if (allAccounts.length > 0) {
         set(state => {
           state.accounts = allAccounts
-          state.account = allAccounts[0]
+          state.account = account.address ? account : allAccounts[0]
           state.allInjected = allInjected
         })
       }
@@ -91,15 +91,18 @@ const useAccountStore = create<AccountStore>((set, get) => ({
       })
       this.fetchBlanceOf(find.address)
     },
-    async fetchContracts(creator = '', signer = '', status = "[2,1,0]", page = 0, size = 5, order = 'desc') {
+    async fetchContracts(creator = '', signer = '', status = "[2,1,0]", page = 0, size = 5, order = 'desc', clear?) {
       const { account, set } = get()
       const res = await client.query({
         query: GET_CONTRACTS_LIST(creator, signer, status, page, size, order),
+        fetchPolicy: "network-only"
       })
       if (res.data && res.data.agreementInfos) {
         const agreementInfos = res.data.agreementInfos
         set((state) => {
-          state.contractListTotal = agreementInfos.total
+          if (page === 0) {
+            state.contractListTotal = agreementInfos.total
+          }
           const agreementInfosData = agreementInfos.data.map(item => {
             return {
               ...item,
@@ -133,10 +136,9 @@ const useAccountStore = create<AccountStore>((set, get) => ({
     },
     async fetchContractsMy(creator = '', signer = '', status = "[2,1,0]", page = 0, size = 5, order = 'desc') {
       const { account, set } = get()
-      const res = await client.query({
-        query: GET_CONTRACTS_LIST(creator, signer, status, page, size, order),
+      const res = await clientMy.query({
+        query: GET_CONTRACTS_LIST_MY(creator, signer, status, page, size, order),
       })
-      console.log(res, 333)
       if (res.data && res.data.agreementInfos) {
         const agreementInfos = res.data.agreementInfos
         set((state) => {
@@ -199,7 +201,7 @@ const useAccountStore = create<AccountStore>((set, get) => ({
               callback(null, result)
             });
           } else {
-            callback('PartialFee is not enough')
+            callback('Fee is not enough')
           }
 
         } catch(err) {
@@ -258,7 +260,7 @@ const useAccountStore = create<AccountStore>((set, get) => ({
             callback(null, result)
           });
         } else {
-          callback('PartialFee is not enough')
+          callback('Fee is not enough')
         }
       })
     },

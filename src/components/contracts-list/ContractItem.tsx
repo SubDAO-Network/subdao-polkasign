@@ -47,12 +47,16 @@ export const ContractItem: React.FC<ContractItemProps> = ({
         {
           isActive &&
           <div className="bg-black">
-            <div className="flex bg-black border-b-2" style={{borderColor: '#BBC8CE'}}>
+            <div className="flex bg-black border-b" style={{borderColor: '#BBC8CE'}}>
               <div className="pl-6 pr-6 pt-7 pb-7  w-1/2 border-r border-lightgray">
                 <div className="flex items-center text-sm mb-5">
                   <div>
-                    <span className="font-semibold">Tx Hash：</span>  -
+                    <span className="font-semibold">Tx Hash：</span>  {contract.txId.slice(0, 8) + '...' + contract.txId.slice(46)}
                   </div>
+                  <CopyToClipboard text={contract.txId} onCopy={() => { message.success({content: 'Copy successfully'}) }}
+                  >
+                    <img src="/images/icons/copy.png" alt="Copy" className="inline-block w-4 h-4 ml-2" />
+                  </CopyToClipboard>
                   {/* <img src="/images/icons/copy.png" alt="Copy" className="inline-block w-4 h-4 ml-2" /> */}
                 </div>
                 <div className="flex items-center w-full text-sm mb-5 truncate" style={{maxWidth: 332}}>

@@ -11,12 +11,14 @@ import { notify } from '../../stores/useNotificationStore';
 import { isValidAddressPolkadotAddress } from '../../utils/contractHelpers'
 import React, { useEffect, useState } from 'react'
 import classNames from 'classnames'
+import { client } from '../../apollo/client';
 
 const { Dragger } = Upload;
 
 export const NewContract: React.FC = () => {
   const appActions = useAppStore((s) => s.actions)
   const accountActions = useAccountStore((s) => s.actions)
+  const account = useAccountStore((s) => s.account)
   const { set: setAppStore } = useAppStore((state) => state)
   const { set: setAccountStore } = useAccountStore((state) => state)
 
@@ -95,6 +97,7 @@ export const NewContract: React.FC = () => {
               setAppStore(state => {
                 state.menuIndex = 1
               })
+              accountActions.fetchContracts('', account.address, "[1,0]", 0, 5, 'desc')
             }, 1000)
           } else {
 
@@ -218,7 +221,14 @@ export const NewContract: React.FC = () => {
           {
             nowState === 2 && <Button onClick={() => {
               // 这里判断最近添加的一个签名人地址是否合法，不合法给提示，不让通过
-              if(!nowSigners[nowSigners.length - 1] || !isValidAddressPolkadotAddress(nowSigners[nowSigners.length - 1].address)) {
+              // if(nowSigners[nowSigners.length - 1] && !isValidAddressPolkadotAddress(nowSigners[nowSigners.length - 1].address)) {
+              //   notify({
+              //     title: 'Address is not valid!'
+              //   })
+              //   return
+              // }
+              const notValid = nowSigners.filter(item => !isValidAddressPolkadotAddress(item.address))
+              if (notValid.length > 0) {
                 notify({
                   title: 'Address is not valid!'
                 })

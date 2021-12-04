@@ -14,6 +14,12 @@ const subgraphUrl = process.env.REACT_APP_GRAPQL
 
 export const client = new ApolloClient({
   uri: `/query`,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({resultCaching: false, addTypename: false}),
+})
+
+
+export const clientMy = new ApolloClient({
+  uri: `/query`,
+  cache: new InMemoryCache({resultCaching: false, addTypename: false}),
 })
 

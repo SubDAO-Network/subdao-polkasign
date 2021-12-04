@@ -23,9 +23,9 @@ export const MainLeft: React.FC = () => {
       <div className=" text-default opacity-60 mt-3">{account.address.slice(0, 5) + '...' + account.address.slice(40)}</div>
       <div className=" text-default mt-3">
         <NumberText value={balanceOfSDT}
-              defaultIfNull="N/A" /> SDT
+              defaultIfNull="N/A" /> GOV
       </div>
-      <div className="flex justify-center items-center bg-default w-56 h-11 rounded mt-5">
+      <div className="flex justify-center items-center bg-default w-56 h-11 rounded mt-5 custom-new-btn">
         <img src="/images/sign/add.png" alt="+" className="w-4 h-4 mr-3 inline-block" />
         <span className="text-black cursor-default" onClick={() => {
           setIsSelect(4)

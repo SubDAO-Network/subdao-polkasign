@@ -1,9 +1,10 @@
 # Development
 
-To start the vue server:
+To start the server:
 
 ```bash
-yarn dev
+yarn 
+yarn start
 ```
 
 To build for production:

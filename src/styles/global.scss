@@ -274,7 +274,8 @@ body {
   }
 }
 .custom-item-content{
-  border-bottom: 1px solid var(--color-gray);
+  border-bottom: 1px solid #E1E4ED;
+  height: 60px;
 }
 
 .custom-border-gray{
@@ -582,5 +583,9 @@ body {
 }
 .ant-pagination-options-quick-jumper input:hover{
   border-color: #D51172;
+}
+.ant-pagination-prev:focus-visible .ant-pagination-item-link, .ant-pagination-next:focus-visible .ant-pagination-item-link, .ant-pagination-prev:hover .ant-pagination-item-link, .ant-pagination-next:hover .ant-pagination-item-link{
+  border-color: #D51172;
+  color: #D51172;
 }
 

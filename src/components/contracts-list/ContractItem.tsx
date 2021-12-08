@@ -59,8 +59,8 @@ export const ContractItem: React.FC<ContractItemProps> = ({
                   </CopyToClipboard>
                   {/* <img src="/images/icons/copy.png" alt="Copy" className="inline-block w-4 h-4 ml-2" /> */}
                 </div>
-                <div className="flex items-center w-full text-sm mb-5 truncate" style={{maxWidth: 332}}>
-                  <div>
+                <div className="flex items-center w-full text-sm mb-5 truncate" style={{maxWidth: 340}}>
+                  <div className="pr-2">
                     <span className="font-semibold">File Hash：</span>  {contract.agreement_file.hash_}
                   </div>
                   <CopyToClipboard text={contract.agreement_file.hash_} onCopy={() => { message.success({content: 'Copy successfully'}) }}

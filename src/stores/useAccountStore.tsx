@@ -26,6 +26,7 @@ interface AccountStoreActions {
   fetchContracts: (creator: string, signer: string, status: string, page: number, size: number, order: string) => Promise<void>,
   fetchContractsMy: (creator: string, signer: string, status: string, page: number, size: number, order: string) => Promise<void>,
   createAgreement: (name: string, signers: Array<any>, hash: string, url: string, callback: any) => Promise<any>,
+  createAgreementWithsign: (name: string, signers: Array<any>, hash: string, url: string, hash2: string, url2: string, callback: any) => Promise<any>,
   attachResourceToAgreement: (index: string, hash: string, url: string, callback: any) => Promise<any>,
   attachResourceToAgreementWithSign: (index: string, hash: string, url: string, callback: any) => Promise<any>,
   fetchBlanceOf: (address: string) => Promise<void>,
@@ -195,6 +196,55 @@ const useAccountStore = create<AccountStore>((set, get) => ({
                 url: url
               }
             })
+          const info = await tx.paymentInfo(account.address)
+          if(new BigNumber(balanceOfSDT).gt(new BigNumber(info.partialFee.toString()).div(new BigNumber(Math.pow(10, 12))))) {
+            tx.signAndSend(account.address, { signer: injector.signer }, (result) => {
+              callback(null, result)
+            });
+          } else {
+            callback('Fee is not enough')
+          }
+
+        } catch(err) {
+          console.log(err)
+        }
+
+      })
+    },
+    async createAgreementWithsign(name, signers, hash, url, hash2, url2, callback) {
+      const { balanceOfSDT, account, accounts, injectedWeb3, allInjected, set } = get()
+
+      const polkasignContract = await usePolkasignContract()
+      const value = 0; // only useful on isPayable messages
+      const gasLimit = -1;
+      const injector = await injectedWeb3.web3FromAddress(account.address);
+      const signRaw = injector?.signer?.signRaw;
+      const { signature } = await signRaw({
+        address: account.address,
+        data: stringToHex(hash),
+        type: 'bytes'
+      });
+
+      return new Promise(async resolve => {
+        try {
+          const tx = polkasignContract.tx
+            .createAgreementWithSign({ value, gasLimit },  {
+              name: name,
+              signers: [account.address, ...signers],
+              agreementFile: {
+                hash: hash,
+                creator: account.address,
+                usage: 'createAgreement',
+                saveAt: Date.now() / 1000,
+                url: url
+              },
+            }, {
+              hash: hash2,
+              creator: account.address,
+              usage: 'sign',
+              saveAt: Date.now() / 1000,
+              url: url2
+            }, signature)
           const info = await tx.paymentInfo(account.address)
           if(new BigNumber(balanceOfSDT).gt(new BigNumber(info.partialFee.toString()).div(new BigNumber(Math.pow(10, 12))))) {
             tx.signAndSend(account.address, { signer: injector.signer }, (result) => {

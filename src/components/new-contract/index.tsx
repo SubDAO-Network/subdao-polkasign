@@ -26,9 +26,10 @@ export const NewContract: React.FC = () => {
   const [ fileUrl, setFileUrl ] = useState('')
   const [ fileInfo, setFileInfo ] = useState({name: ''})
   const [ file, setFile ] = useState(null)
-  const [nowSigners, setNowSigners] = useState([])
-  const [step, setStep] = useState(1)
+  const [ nowSigners, setNowSigners ] = useState([])
+  const [ step, setStep ] = useState(1)
   const [onPresentConnectWallet, onDismiss] = useModal(<ReviewSendTip step={step} />)
+  const [ signatureData, setSignatureData ] = useState([])
 
   const props = {
     showUploadList: false,
@@ -64,10 +65,60 @@ export const NewContract: React.FC = () => {
     setAccountStore(state => {
       state.createStep = 2
     })
+
     // const { hash, publicUrl } = await appActions.fleekUpload(new Blob(['abcdefg']) as File)
     // let tmpFile = new Blob([JSON.stringify({top: 100, left: 100, content: 'abcd'})]) as any
     // tmpFile.name = 'abc.txt'
     const { hash, publicUrl } = await appActions.fleekUpload(file)
+    console.log(hash, publicUrl)
+    console.log(signatureData, 2222)
+    if(signatureData.length > 0) {
+      const tmpFile = new Blob([JSON.stringify(signatureData)]) as any
+      tmpFile.name = `sign_info_${Date.now()}.txt`
+      const { hash: hash2, publicUrl: publicUrl2 } = await appActions.fleekUpload(tmpFile)
+      console.log(hash2, publicUrl2)
+      setAccountStore(state => {
+        state.createStep = 3
+      })
+      // 2.
+      try {
+        const res = await accountActions.createAgreementWithsign(fileInfo.name, nowSigners.map(signer => signer.address), hash, publicUrl, hash2, publicUrl2,
+          (err, result) => {
+            if(err) {
+              notify({
+                title: err,
+              })
+              onDismiss()
+              return;
+            }
+            if (result.status.isInBlock) {
+              console.log('in a block')
+              setAccountStore(state => {
+                state.createStep = 4
+              })
+            } else if (result.status.isFinalized) {
+              console.log('isFinalized')
+              setAccountStore(state => {
+                state.createStep = 5
+              })
+              setTimeout(() => {
+                onDismiss()
+                setAppStore(state => {
+                  state.menuIndex = 1
+                })
+                accountActions.fetchContracts('', account.address, "[1,0]", 0, 5, 'desc')
+              }, 1000)
+            } else {
+
+            }
+          }
+        )
+      } catch(err) {
+        console.log(err)
+      }
+      setStep(4)
+      return;
+    }
     setAccountStore(state => {
       state.createStep = 3
     })
@@ -108,8 +159,6 @@ export const NewContract: React.FC = () => {
       console.log(err)
     }
     setStep(4)
-
-
   }
 
   return (
@@ -239,6 +288,11 @@ export const NewContract: React.FC = () => {
           }
           {
             nowState === 3 && <Button onClick={() => {
+              const signatureData = (document.querySelector('#iframe') as any).contentWindow.signatureList
+              console.log(signatureData)
+              if(signatureData && setSignatureData.length > 0) {
+                setSignatureData(signatureData)
+              }
               setNowState(4)
             }}>Review</Button>
           }

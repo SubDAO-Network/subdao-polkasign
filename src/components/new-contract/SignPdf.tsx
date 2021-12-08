@@ -16,7 +16,6 @@ export const SignPdf: React.FC = () => {
   const nowAgreement = useAccountStore((s) => s.nowAgreement)
   const { set: setAppStore } = useAppStore((state) => state)
   const { set: setAccountStore } = useAccountStore((state) => state)
-  console.log(nowAgreement)
   const [ nowState, setNowState ] = useState(0)
 
   const [step, setStep] = useState(1)

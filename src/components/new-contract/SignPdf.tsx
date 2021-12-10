@@ -49,6 +49,7 @@ export const SignPdf: React.FC = () => {
     })
     accountActions.attachResourceToAgreementWithSign(nowAgreement.index, nowAgreement.agreement_file.hash_, publicUrl,
       (err, result) => {
+        console.log(result)
         if(err) {
           notify({
             title: err,

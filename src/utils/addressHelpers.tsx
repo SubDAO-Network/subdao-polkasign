@@ -7,10 +7,6 @@ export const getAddress = (address: Address): string => {
   return address[chainId] ? address[chainId] : address[mainNetChainId]
 }
 
-export const getIdoAddress = () => {
-  return getAddress(addresses.ido)
-}
-
 export const getSignAddress = () => {
   return getAddress(addresses.sign)
 }

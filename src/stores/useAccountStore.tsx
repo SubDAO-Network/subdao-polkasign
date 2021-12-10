@@ -225,6 +225,11 @@ const useAccountStore = create<AccountStore>((set, get) => ({
         type: 'bytes'
       });
 
+      console.log('hash: ', hash)
+      console.log('url: ', url)
+      console.log('hash2: ', hash2)
+      console.log('url2: ', url2)
+      console.log('signature: ', signature)
       return new Promise(async resolve => {
         try {
           const tx = polkasignContract.tx

@@ -70,13 +70,10 @@ export const NewContract: React.FC = () => {
     // let tmpFile = new Blob([JSON.stringify({top: 100, left: 100, content: 'abcd'})]) as any
     // tmpFile.name = 'abc.txt'
     const { hash, publicUrl } = await appActions.fleekUpload(file)
-    console.log(hash, publicUrl)
-    console.log(signatureData, 2222)
     if(signatureData.length > 0) {
       const tmpFile = new Blob([JSON.stringify(signatureData)]) as any
       tmpFile.name = `sign_info_${Date.now()}.txt`
       const { hash: hash2, publicUrl: publicUrl2 } = await appActions.fleekUpload(tmpFile)
-      console.log(hash2, publicUrl2)
       setAccountStore(state => {
         state.createStep = 3
       })
@@ -91,6 +88,7 @@ export const NewContract: React.FC = () => {
               onDismiss()
               return;
             }
+            console.log(result)
             if (result.status.isInBlock) {
               console.log('in a block')
               setAccountStore(state => {

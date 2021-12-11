@@ -70,6 +70,7 @@ export const NewContract: React.FC = () => {
     // let tmpFile = new Blob([JSON.stringify({top: 100, left: 100, content: 'abcd'})]) as any
     // tmpFile.name = 'abc.txt'
     const { hash, publicUrl } = await appActions.fleekUpload(file)
+    console.log('new hash: ', hash)
     if(signatureData.length > 0) {
       const tmpFile = new Blob([JSON.stringify(signatureData)]) as any
       tmpFile.name = `sign_info_${Date.now()}.txt`
@@ -79,7 +80,7 @@ export const NewContract: React.FC = () => {
       })
       // 2.
       try {
-        const res = await accountActions.createAgreementWithsign(fileInfo.name, nowSigners.map(signer => signer.address), hash, publicUrl, hash2, publicUrl2,
+        const res = await accountActions.createAgreementWithsign(fileInfo.name, nowSigners.map(signer => signer.address), hash.slice(0,32), publicUrl, hash2, publicUrl2,
           (err, result) => {
             if(err) {
               notify({
@@ -88,7 +89,6 @@ export const NewContract: React.FC = () => {
               onDismiss()
               return;
             }
-            console.log(result)
             if (result.status.isInBlock) {
               console.log('in a block')
               setAccountStore(state => {

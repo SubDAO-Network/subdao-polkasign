@@ -299,7 +299,9 @@ const useAccountStore = create<AccountStore>((set, get) => ({
         data: stringToHex(hash),
         type: 'bytes'
       });
-
+      console.log('hash: ', hash)
+      console.log('stringToHex(hash): ', stringToHex(hash))
+      console.log('signature: ', signature)
       return new Promise(async resolve => {
         const tx = polkasignContract.tx
           .attachResourceWithSign({ value, gasLimit }, index, {

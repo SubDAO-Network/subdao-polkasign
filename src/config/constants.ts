@@ -4,7 +4,7 @@ export const VERSION = process.env.NEXT_PUBLIC_VERSION
 
 export default {
   sign: {
-    5: '5EYiajivw4m4mNcCefs9T16CpbZdwtp6oNzuCAwN8bDJvkpC',
+    5: '5DBfizWEFpwki4BrYufC3uYims74d1BUW15xwEnHNssWrGHA',
     1: ''
   }
 }

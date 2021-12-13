@@ -47,7 +47,7 @@ export const ContractItem: React.FC<ContractItemProps> = ({
         {
           isActive &&
           <div className="bg-black">
-            <div className="flex bg-black border-b" style={{borderColor: '#BBC8CE'}}>
+            <div className="flex bg-black border-b" style={{borderColor: '#e1e4ed'}}>
               <div className="pl-6 pr-6 pt-7 pb-7  w-1/2 border-r border-lightgray">
                 <div className="flex items-center text-sm mb-5">
                   <div>
